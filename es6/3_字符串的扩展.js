@@ -147,3 +147,127 @@ function fn() {
 // foo Hello World bar
 // 如果大括号中的值不是字符串，将按照一般的规则转为字符串。比如，大括号中是一个对象，将默认调用对象的toString方法。
 // 如果模板字符串中的变量没有声明，将报错。
+
+// 还能嵌套
+const tmpl = addrs => `
+  <table>
+  ${addrs.map(addr => `
+    <tr><td>${addr.first}</td></tr>
+    <tr><td>${addr.last}</td></tr>
+  `).join('')}
+  </table>
+`;
+// 上面使用
+const data = [
+    { first: '<Jane>', last: 'Bond' },
+    { first: 'Lars', last: '<Croft>' },
+];
+console.log(tmpl(data));
+// <table>
+//
+//   <tr><td><Jane></td></tr>
+//   <tr><td>Bond</td></tr>
+//
+//   <tr><td>Lars</td></tr>
+//   <tr><td><Croft></td></tr>
+//
+// </table>
+
+// 如果需要引用模板字符串本身，在需要时执行，可以像下面这样写
+// 写法一
+let str = 'return ' + '`Hello ${name}!`';
+let func = new Function('name', str);
+func('Jack') // "Hello Jack!"
+// 写法二
+let str = '(name) => `Hello ${name}!`';
+let func = eval.call(null, str);
+func('Jack') // "Hello Jack!"
+
+
+
+// 实例：模板编译
+var template = `
+<ul>
+  <% for(var i=0; i < data.supplies.length; i++) { %>
+    <li><%= data.supplies[i] %></li>
+  <% } %>
+</ul>
+`;
+// 上面代码在模板字符串之中，放置了一个常规模板。该模板使用<%...%>放置JavaScript代码，使用<%= ... %>输出JavaScript表达式。
+// 一种思路是将其转换为JavaScript表达式字符串。
+var evalExpr = /<%=(.+?)%>/g;
+var expr = /<%([\s\S]+?)%>/g;
+template = template
+  .replace(evalExpr, '`); \n  echo( $1 ); \n  echo(`')
+  .replace(expr, '`); \n $1 \n  echo(`');
+template = 'echo(`' + template + '`);';
+
+// 然后，将template封装在一个函数里面返回，就可以了。
+var script =
+`(function parse(data){
+  var output = "";
+  function echo(html){
+    output += html;
+  }
+  ${ template }
+  return output;
+})`;
+return script;
+
+// 将上面的内容拼装成一个模板编译函数compile。
+function compile(template){
+  var evalExpr = /<%=(.+?)%>/g;
+  var expr = /<%([\s\S]+?)%>/g;
+  template = template
+    .replace(evalExpr, '`); \n  echo( $1 ); \n  echo(`')
+    .replace(expr, '`); \n $1 \n  echo(`');
+  template = 'echo(`' + template + '`);';
+  var script =
+  `(function parse(data){
+    var output = "";
+    function echo(html){
+      output += html;
+    }
+    ${ template }
+    return output;
+  })`;
+  return script;
+}
+// compile函数的用法如下。
+var parse = eval(compile(template));
+div.innerHTML = parse({ supplies: [ "broom", "mop", "cleaner" ] });
+//   <ul>
+//     <li>broom</li>
+//     <li>mop</li>
+//     <li>cleaner</li>
+//   </ul>
+
+
+// 标签模板
+alert`123`
+// 等同于
+alert(123)
+// 但是，如果模板字符里面有变量，就不是简单的调用了，而是会将模板字符串先处理成多个参数，再调用函数。
+var a = 5;
+var b = 10;
+tag`Hello ${ a + b } world ${ a * b }`;
+// 等同于
+tag(['Hello ', ' world ', ''], 15, 50);
+
+// 函数tag依次会接收到多个参数
+function tag(stringArr, value1, value2){
+  // ...
+}
+// 等同于
+function tag(stringArr, ...values){
+  // ...
+}
+
+
+
+// String.raw()
+// String.raw方法，往往用来充当模板字符串的处理函数，返回一个斜杠都被转义（即斜杠前面再加一个斜杠）的字符串，对应于替换变量后的模板字符串。
+String.raw`Hi\n${2+3}!`;
+// "Hi\\n5!"
+String.raw`Hi\u000A!`;
+// 'Hi\\u000A!
