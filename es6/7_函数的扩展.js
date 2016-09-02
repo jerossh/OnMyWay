@@ -447,3 +447,90 @@ function f(x) {
 
 
 // 尾递归
+// 递归非常耗费内存，因为需要同时保存成千上百个调用帧，很容易发生“栈溢出”错误（stack overflow）。但对于尾递归来说，由于只存在一个调用帧，所以永远不会发生“栈溢出”错误。
+function factorial(n) {
+  if (n === 1) return 1;
+  return n * factorial(n - 1);
+}
+factorial(5) // 120
+// 如果改写成尾递归，只保留一个调用记录，复杂度 O(1) 。
+function factorial(n, total) {
+  if (n === 1) return total;
+  return factorial(n - 1, n * total);
+}
+factorial(5, 1) // 120
+// 柯里化
+function currying(fn, n) {
+  return function (m) {
+    return fn.call(this, m, n);
+  };
+}
+function tailFactorial(n, total) {
+  if (n === 1) return total;
+  return tailFactorial(n - 1, n * total);
+}
+const factorial = currying(tailFactorial, 1);
+factorial(5) // 120
+// 第二种方法就简单多了，就是采用ES6的函数默认值。
+function factorial(n, total = 1) {
+  if (n === 1) return total;
+  return factorial(n - 1, n * total);
+}
+factorial(5) // 120
+
+
+// ES6的尾调用优化只在严格模式下开启，正常模式是无效的。
+// 这是因为在正常模式下，函数内部有两个变量，可以跟踪函数的调用栈。
+// func.arguments：返回调用时函数的参数。
+// func.caller：返回调用当前函数的那个函数。
+
+// 正常模式下的优化，用循环模式替换递归
+// 蹦床函数 trampoline
+function trampoline(f) {
+  while (f && f instanceof Function) {
+    f = f();
+  }
+  return f;
+}
+// 然后，要做的就是将原来的递归函数，改写为每一步返回另一个函数。
+function sum(x, y) {
+  if (y > 0) {
+    return sum.bind(null, x + 1, y - 1);
+  } else {
+    return x;
+  }
+}
+// 蹦床函数并不是真正的尾递归优化，下面的实现才是。
+// 完全不懂
+function tco(f) {
+  var value;
+  var active = false;
+  var accumulated = [];
+
+  return function accumulator() {
+
+    accumulated.push(arguments);
+    if (!active) {
+      active = true;
+      console.log("1: "+accumulated);
+      while (accumulated.length) {
+        console.log('2: '+accumulated.length);
+        value = f.apply(this, accumulated.shift());
+        console.log("v:" + value);
+      }
+      active = false;
+      return value;
+    }
+  };
+}
+var sum = tco(function(x, y) {
+  if (y > 0) {
+    return sum(x + 1, y - 1)
+  }
+  else {
+    return x
+  }
+});
+
+sum(1, 5)
+// 100001
