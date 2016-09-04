@@ -108,4 +108,53 @@ objectSymbols
 
 
 
-// 5       Symbol.for()，Symbol.keyFor()
+// 5 Symbol.for()，Symbol.keyFor()
+// 有时，我们希望重新使用同一个Symbol值，Symbol.for方法可以做到这一点。
+var s1 = Symbol.for('foo');
+var s2 = Symbol.for('foo');
+s1 === s2 // true
+// Symbol.keyFor方法返回一个已登记的Symbol类型值的key。
+var s1 = Symbol.for("foo");
+Symbol.keyFor(s1) // "foo"
+var s2 = Symbol("foo");
+Symbol.keyFor(s2) // undefined
+
+// 需要注意的是，Symbol.for为Symbol值登记的名字，是全局环境的，可以在不同的iframe或service worker中取到同一个值。
+
+
+
+// 6 实例：模块的singletion 模式
+// mod.js
+const FOO_KEY = Symbol.for('foo');
+function A() {
+  this.foo = 'hello';
+}
+if (!global[FOO_KEY]) {
+  global[FOO_KEY] = new A();
+}
+module.exports = global[FOO_KEY];
+
+
+
+// 7 内置的 Symbol 值
+// 除了定义自己使用的Symbol值以外，ES6还提供了11个内置的Symbol值，指向语言内部使用的方法。
+// 对象的Symbol.hasInstance属性
+Symbol.hasInstance
+// 对象的Symbol.isConcatSpreadable属性等于一个布尔值，表示该对象使用Array.prototype.concat()时，是否可以展开。
+let arr1 = ['c', 'd'];
+['a', 'b'].concat(arr1, 'e') // ['a', 'b', 'c', 'd', 'e']
+arr1[Symbol.isConcatSpreadable] // undefined
+
+let arr2 = ['c', 'd'];
+arr2[Symbol.isConcatSpreadable] = false;
+['a', 'b'].concat(arr2, 'e') // ['a', 'b', ['c','d'], 'e']
+
+// Symbol.species属性
+// Symbol.match属性
+// Symbol.replace属性
+// Symbol.search属性
+// Symbol.split属性
+// Symbol.iterator属性
+// Symbol.toPrimitive属性
+// Symbol.toStringTag属性
+// Symbol.unscopables属性
