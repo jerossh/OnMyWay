@@ -413,3 +413,319 @@ it.next()       // {value: 3, done: false}
 it.next();      // "v: foo"    // {value: 4, done: false}
 it.next()       // {value: undefined, done: true}
 // 上面代码在第四次调用next方法的时候，屏幕上会有输出，这是因为函数foo的return语句，向函数bar提供了返回值。
+// 再看一个例子。
+function* genFuncWithReturn() {
+  yield 'a';
+  yield 'b';
+  return 'The result';
+}
+function* logReturned(genObj) {
+  let result = yield* genObj;
+  console.log(result);
+}
+[...logReturned(genFuncWithReturn())]
+// The result
+// 值为 [ 'a', 'b' ]
+
+// yield*命令可以很方便地取出嵌套数组的所有成员。
+function* iterTree(tree) {
+  if (Array.isArray(tree)) {
+    for(let i=0; i < tree.length; i++) {
+      yield* iterTree(tree[i]);
+    }
+  } else {
+    yield tree;
+  }
+}
+
+const tree = [ 'a', ['b', 'c'], ['d', 'e'] ];
+
+for(let x of iterTree(tree)) {
+  console.log(x);
+}
+// a
+// b
+// c
+// d
+// e
+
+// 下面是一个稍微复杂的例子，使用yield*语句遍历完全二叉树。
+// 下面是二叉树的构造函数，
+// 三个参数分别是左树、当前节点和右树
+function Tree(left, label, right) {
+  this.left = left;
+  this.label = label;
+  this.right = right;
+}
+
+// 下面是中序（inorder）遍历函数。
+// 由于返回的是一个遍历器，所以要用generator函数。
+// 函数体内采用递归算法，所以左树和右树要用yield*遍历
+function* inorder(t) {
+  if (t) {
+    yield* inorder(t.left);
+    yield t.label;
+    yield* inorder(t.right);
+  }
+}
+// 下面生成二叉树
+function make(array) {
+  // 判断是否为叶节点
+  if (array.length == 1) return new Tree(null, array[0], null);
+  return new Tree(make(array[0]), array[1], make(array[2]));
+}
+let tree = make([[['a'], 'b', ['c']], 'd', [['e'], 'f', ['g']]]);
+// new Tree([['a'], 'b', ['c']], d, [['e'], 'f', ['g']])
+// tree.left = make([['a'], 'b', ['c']]);
+// tree.label = d;
+// tree.right = make([['e'], 'f', ['g']]);
+
+// 遍历二叉树
+var result = [];
+for (let node of inorder(tree)) {
+  result.push(node);
+}
+result
+// ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+
+
+
+// 7 作为对象属性的Generator函数
+let obj = {
+  * myGeneratorMethod() {
+    ···
+  }
+};
+// 等价于
+let obj = {
+  myGeneratorMethod: function* () {
+    // ···
+  }
+};
+
+
+
+// 8 Generator函数的this
+// Generator函数总是返回一个遍历器，ES6规定这个遍历器是Generator函数的实例，也继承了Generator函数的prototype对象上的方法。
+// 但是，如果把g当作普通的构造函数，并不会生效，因为g返回的总是遍历器对象，而不是this对象。
+function* g() {
+  this.a = 11;
+}
+let obj = g();
+obj.a // undefined
+// Generator函数也不能跟new命令一起用，会报错。
+function* F() {
+  yield this.x = 2;
+  yield this.y = 3;
+}
+new F()// TypeError: F is not a constructor
+// 上面代码中，new命令跟构造函数F一起使用，结果报错，因为F不是构造函数
+
+// 下面是一个变通方法。首先，生成一个空对象，使用bind方法绑定Generator函数内部的this。
+// 这样，构造函数调用以后，这个空对象就是Generator函数的实例对象了。
+function* F() {
+  this.a = 1;
+  yield this.b = 2;
+  yield this.c = 3;
+}
+var obj = {};
+var f = F.call(obj);
+f.next();  // Object {value: 2, done: false}
+f.next();  // Object {value: 3, done: false}
+f.next();  // Object {value: undefined, done: true}
+obj.a // 1
+obj.b // 2
+obj.c // 3
+
+// 一个办法就是将obj换成F.prototype。
+function* F() {
+  this.a = 1;
+  yield this.b = 2;
+  yield this.c = 3;
+}
+var f = F.call(F.prototype);
+f.next();  // Object {value: 2, done: false}
+f.next();  // Object {value: 3, done: false}
+f.next();  // Object {value: undefined, done: true}
+f.a // 1
+f.b // 2
+f.c // 3
+
+
+// 9 含义
+// Generator与状态机
+// Generator是实现状态机的最佳结构。比如，下面的clock函数就是一个状态机。
+var ticking = true;
+var clock = function() {
+  if (ticking)
+    console.log('Tick!');
+  else
+    console.log('Tock!');
+  ticking = !ticking;
+}
+// 上面代码的clock函数一共有两种状态（Tick和Tock），每运行一次，就改变一次状态。这个函数如果用Generator实现，就是下面这样。
+var clock = function*() {
+  while (true) {
+    console.log('Tick!');
+    yield;
+    console.log('Tock!');
+    yield;
+  }
+};
+
+
+// Generator 与 协程
+// 1）协程与子例程的差异
+// 从实现上看，在内存中，子例程只使用一个栈（stack），而协程是同时存在多个栈，但只有一个栈是在运行状态，
+// 也就是说，协程是以多占用内存为代价，实现多任务的并行。
+// 2）协程与普通线程的差异
+// 不同之处在于，同一时间可以有多个线程处于运行状态，但是运行的协程只能有一个，其他协程都处于暂停状态。
+// 此外，普通的线程是抢先式的，到底哪个线程优先得到资源，必须由运行环境决定，但是协程是合作式的，执行权由协程自己分配。
+
+
+
+// 10 应用
+// 1）异步操作的同步化表达
+// Generator函数的一个重要实际意义就是用来处理异步操作，改写回调函数。
+function* loadUI() {
+  showLoadingScreen();
+  yield loadUIDataAsynchronously();
+  hideLoadingScreen();
+}
+var loader = loadUI();
+// 加载UI
+loader.next()
+// 卸载UI
+loader.next()
+// 上面代码表示，第一次调用loadUI函数时，该函数不会执行，仅返回一个遍历器。
+// 下一次对该遍历器调用next方法，则会显示Loading界面，并且异步加载数据。
+// 等到数据加载完成，再一次使用next方法，则会隐藏Loading界面。
+// 可以看到，这种写法的好处是所有Loading界面的逻辑，都被封装在一个函数，按部就班非常清晰。
+
+// Ajax是典型的异步操作，通过Generator函数部署Ajax操作，可以用同步的方式表达。
+function* main() {
+  var result = yield request("http://some.url");
+  var resp = JSON.parse(result);
+    console.log(resp.value);
+}
+function request(url) {
+  makeAjaxCall(url, function(response){
+    it.next(response);       // result == response
+  });
+}
+var it = main();
+it.next();
+
+// 下面是另一个例子，通过Generator函数逐行读取文本文件。
+function* numbers() {
+  let file = new FileReader("numbers.txt");
+  try {
+    while(!file.eof) {
+      yield parseInt(file.readLine(), 10);
+    }
+  } finally {
+    file.close();
+  }
+}
+
+// 2）控制流管理
+// 如果有一个多步操作非常耗时，采用回调函数，可能会写成下面这样。
+step1(function (value1) {
+  step2(value1, function(value2) {
+    step3(value2, function(value3) {
+      step4(value3, function(value4) {
+        // Do something with value4
+      });
+    });
+  });
+});
+// 采用Promise改写上面的代码。
+Promise.resolve(step1)
+  .then(step2)
+  .then(step3)
+  .then(step4)
+  .then(function (value4) {
+    // Do something with value4
+  }, function (error) {
+    // Handle any error from step1 through step4
+  })
+  .done();
+// 上面代码已经把回调函数，改成了直线执行的形式，但是加入了大量Promise的语法。Generator函数可以进一步改善代码运行流程。
+function* longRunningTask(value1) {
+  try {
+    var value2 = yield step1(value1);
+    var value3 = yield step2(value2);
+    var value4 = yield step3(value3);
+    var value5 = yield step4(value4);
+    // Do something with value4
+  } catch (e) {
+    // Handle any error from step1 through step4
+  }
+}
+// 然后，使用一个函数，按次序自动执行所有步骤。
+scheduler(longRunningTask(initialValue));
+function scheduler(task) {
+  var taskObj = task.next(task.value);
+  // 如果Generator函数未结束，就继续调用
+  if (!taskObj.done) {
+    task.value = taskObj.value
+    scheduler(task);
+  }
+}
+// 注意，上面这种做法，只适合同步操作，即所有的task都必须是同步的，不能有异步操作。
+
+// 下面，利用for...of循环会自动依次执行yield命令的特性，提供一种更一般的控制流管理的方法。
+let steps = [step1Func, step2Func, step3Func];
+function *iterateSteps(steps){
+  for (var i=0; i< steps.length; i++){
+    var step = steps[i];
+    yield step();
+  }
+}
+
+// 3)部署iterator接口
+// 利用Generator函数，可以在任意对象上部署iterator接口。
+function* iterEntries(obj) {
+  let keys = Object.keys(obj);
+  for (let i=0; i < keys.length; i++) {
+    let key = keys[i];
+    yield [key, obj[key]];
+  }
+}
+let myObj = { foo: 3, bar: 7 };
+for (let [key, value] of iterEntries(myObj)) {
+  console.log(key, value);
+}
+// foo 3
+// bar 7
+
+// 下面是一个对数组部署Iterator接口的例子，尽管数组原生具有这个接口。
+function* makeSimpleGenerator(array){
+  var nextIndex = 0;
+  while(nextIndex < array.length){
+    yield array[nextIndex++];
+  }
+}
+var gen = makeSimpleGenerator(['yo', 'ya']);
+gen.next().value // 'yo'
+gen.next().value // 'ya'
+gen.next().done  // true
+
+// 4)作为数据结构
+function *doStuff() {
+  yield fs.readFile.bind(null, 'hello.txt');
+  yield fs.readFile.bind(null, 'world.txt');
+  yield fs.readFile.bind(null, 'and-such.txt');
+}
+// 上面代码就是依次返回三个函数，但是由于使用了Generator函数，导致可以像处理数组那样，处理这三个返回的函数。
+for (task of doStuff()) {
+  // task是一个函数，可以像回调函数那样使用它
+}
+// 实际上，如果用ES5表达，完全可以用数组模拟Generator的这种用法。
+function doStuff() {
+  return [
+    fs.readFile.bind(null, 'hello.txt'),
+    fs.readFile.bind(null, 'world.txt'),
+    fs.readFile.bind(null, 'and-such.txt')
+  ];
+}
