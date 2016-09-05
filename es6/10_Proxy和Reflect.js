@@ -151,7 +151,7 @@ proxy.foo // TypeError: Revoked
 
 
 
-// 4 reflext
+// 4 reflect
 // Reflect对象的设计目的有这样几个。
 // 1） 将Object对象的一些明显属于语言内部的方法（比如Object.defineProperty），放到Reflect对象上。
 //     现阶段，某些方法同时在Object和Reflect对象上部署，未来的新方法将只部署在Reflect对象上。
