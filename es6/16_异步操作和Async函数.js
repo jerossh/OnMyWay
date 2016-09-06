@@ -295,3 +295,276 @@ co(gen).then(function (){
 // 1）回调函数。将异步操作包装成Thunk函数，在回调函数里面交回执行权。
 // 2）Promise 对象。将异步操作包装成Promise对象，用then方法交回执行权。
 // co模块其实就是将两种自动执行器（Thunk函数和Promise对象），包装成一个模块。使用co的前提条件是，Generator函数的yield命令后面，只能是Thunk函数或Promise对象。
+
+// 基于Promise对象的自动执行
+// 还是沿用上面的例子。首先，把fs模块的readFile方法包装成一个Promise对象。
+var fs = require('fs');
+
+var readFile = function (fileName){
+  return new Promise(function (resolve, reject){
+    fs.readFile(fileName, function(error, data){
+      if (error) return reject(error);
+      resolve(data);
+    });
+  });
+};
+
+var gen = function* (){
+  var f1 = yield readFile('/etc/fstab');
+  var f2 = yield readFile('/etc/shells');
+  console.log(f1.toString());
+  console.log(f2.toString());
+};
+// 然后，手动执行上面的Generator函数。
+var g = gen();
+g.next().value.then(function(data){
+  g.next(data).value.then(function(data){
+    g.next(data);
+  });
+});
+// 手动执行其实就是用then方法，层层添加回调函数。理解了这一点，就可以写出一个自动执行器。
+function run(gen){
+  var g = gen();
+  function next(data){
+    var result = g.next(data);
+    if (result.done) return result.value;
+    result.value.then(function(data){
+      next(data);
+    });
+  }
+  next();
+}
+run(gen);
+// 上面代码中，只要Generator函数还没执行到最后一步，next函数就调用自身，以此实现自动执行。
+
+
+// co模块源码
+// 首先，co函数接受Generator函数作为参数，返回一个 Promise 对象。
+function co(gen) {
+  var ctx = this;
+  return new Promise(function(resolve, reject) {
+  });
+}
+// 在返回的Promise对象里面，co先检查参数gen是否为Generator函数。如果是，就执行该函数，
+// 得到一个内部指针对象；如果不是就返回，并将Promise对象的状态改为resolved。
+function co(gen) {
+  var ctx = this;
+  return new Promise(function(resolve, reject) {
+    if (typeof gen === 'function') gen = gen.call(ctx);
+    if (!gen || typeof gen.next !== 'function') return resolve(gen);
+  });
+}
+// 接着，co将Generator函数的内部指针对象的next方法，包装成onFulfilled函数。这主要是为了能够捕捉抛出的错误。
+function co(gen) {
+  var ctx = this;
+
+  return new Promise(function(resolve, reject) {
+    if (typeof gen === 'function') gen = gen.call(ctx);
+    if (!gen || typeof gen.next !== 'function') return resolve(gen);
+
+    onFulfilled();
+    function onFulfilled(res) {
+      var ret;
+      try {
+        ret = gen.next(res);
+      } catch (e) {
+        return reject(e);
+      }
+      next(ret);
+    }
+  });
+}
+// 最后，就是关键的next函数，它会反复调用自身。
+function next(ret) {
+  if (ret.done) return resolve(ret.value);
+  var value = toPromise.call(ctx, ret.value);
+  if (value && isPromise(value)) return value.then(onFulfilled, onRejected);
+  return onRejected(new TypeError('You may only yield a function, promise, generator, array, or object, '
+    + 'but the following object was passed: "' + String(ret.value) + '"'));
+}
+// 上面代码中，next 函数的内部代码，一共只有四行命令。
+// 第一行，检查当前是否为 Generator 函数的最后一步，如果是就返回。
+// 第二行，确保每一步的返回值，是 Promise 对象。
+// 第三行，使用 then 方法，为返回值加上回调函数，然后通过 onFulfilled 函数再次调用 next 函数。
+// 第四行，在参数不符合要求的情况下（参数非 Thunk 函数和 Promise 对象），将 Promise 对象的状态改为 rejected，从而终止执行。
+
+
+// 处理并发的一部操作
+// co支持并发的异步操作，即允许某些操作同时进行，等到它们全部完成，才进行下一步。
+// 这时，要把并发的操作都放在数组或对象里面，跟在yield语句后面。
+// 数组的写法
+co(function* () {
+  var res = yield [
+    Promise.resolve(1),
+    Promise.resolve(2)
+  ];
+  console.log(res);
+}).catch(onerror);
+// 对象的写法
+co(function* () {
+  var res = yield {
+    1: Promise.resolve(1),
+    2: Promise.resolve(2),
+  };
+  console.log(res);
+}).catch(onerror);
+
+// 下面是另一个例子。
+co(function* () {
+  var values = [n1, n2, n3];
+  yield values.map(somethingAsync);
+});
+function* somethingAsync(x) {
+  // do something async
+  return y
+}
+
+
+
+// 5 async 函数
+// 含义
+// ES7提供了async函数，使得异步操作变得更加方便。async函数是什么？一句话，async函数就是Generator函数的语法糖。
+// 前文有一个Generator函数，依次读取两个文件。
+var fs = require('fs');
+
+var readFile = function (fileName) {
+  return new Promise(function (resolve, reject) {
+    fs.readFile(fileName, function(error, data) {
+      if (error) reject(error);
+      resolve(data);
+    });
+  });
+};
+
+var gen = function* (){
+  var f1 = yield readFile('/etc/fstab');
+  var f2 = yield readFile('/etc/shells');
+  console.log(f1.toString());
+  console.log(f2.toString());
+};
+// 写成async函数，就是下面这样。
+var asyncReadFile = async function (){
+  var f1 = await readFile('/etc/fstab');
+  var f2 = await readFile('/etc/shells');
+  console.log(f1.toString());
+  console.log(f2.toString());
+};
+
+// async函数对 Generator 函数的改进，体现在以下四点。
+// 1）内置执行器。
+// Generator函数的执行必须靠执行器，所以才有了co模块，而async函数自带执行器。也就是说，async函数的执行，与普通函数一模一样，只要一行。
+// 2）更好的语义。
+// async和await，比起星号和yield，语义更清楚了。async表示函数里有异步操作，await表示紧跟在后面的表达式需要等待结果。
+// 3）更广的适用性。
+// co模块约定，yield命令后面只能是Thunk函数或Promise对象，而async函数的await命令后面，可以是Promise对象和原始类型的值（数值、字符串和布尔值，但这时等同于同步操作）。
+// 4）返回值是Promise。
+// async函数的返回值是Promise对象，这比Generator函数的返回值是Iterator对象方便多了。你可以用then方法指定下一步的操作。
+
+// 语法
+// async函数的语法规则总体上比较简单，难点是错误处理机制。
+// 1）async函数返回一个Promise对象。
+// async函数内部return语句返回的值，会成为then方法回调函数的参数。
+async function f() {
+  return 'hello world';
+}
+f().then(v => console.log(v))     // "hello world"
+// async函数内部抛出错误，会导致返回的Promise对象变为reject状态。抛出的错误对象会被catch方法回调函数接收到。
+async function f() {
+  throw new Error('出错了');
+}
+f().then(
+  v => console.log(v),
+  e => console.log(e)
+)
+// Error: 出错了
+
+// 2）async函数返回的Promise对象，必须等到内部所有await命令的Promise对象执行完，才会发生状态改变。
+// 也就是说，只有async函数内部的异步操作执行完，才会执行then方法指定的回调函数。
+// 下面是一个例子。
+async function getTitle(url) {
+  let response = await fetch(url);
+  let html = await response.text();
+  return html.match(/<title>([\s\S]+)<\/title>/i)[1];
+}
+getTitle('https://tc39.github.io/ecma262/').then(console.log)
+// "ECMAScript 2017 Language Specification"
+// 3）正常情况下，await命令后面是一个Promise对象。如果不是，会被转成一个立即resolve的Promise对象。
+async function f() {
+  return await 123;
+}
+f().then(v => console.log(v))
+// 123
+// 上面代码中，await命令的参数是数值123，它被转成Promise对象，并立即resolve。
+// await命令后面的Promise对象如果变为reject状态，则reject的参数会被catch方法的回调函数接收到。
+async function f() {
+  await Promise.reject('出错了');
+}
+f()
+.then(v => console.log(v))
+.catch(e => console.log(e))
+// 出错了
+// 注意，上面代码中，await语句前面没有return，但是reject方法的参数依然传入了catch方法的回调函数。这里如果在await前面加上return，效果是一样的。
+// 只要一个await语句后面的Promise变为reject，那么整个async函数都会中断执行。
+async function f() {
+  await Promise.reject('出错了');
+  await Promise.resolve('hello world'); // 不会执行
+}
+// 为了避免这个问题，可以将第一个await放在try...catch结构里面，这样第二个await就会执行。
+async function f() {
+  try {
+    await Promise.reject('出错了');
+  } catch(e) {
+  }
+  return await Promise.resolve('hello world');
+}
+
+f()
+.then(v => console.log(v))
+// hello world
+如果确实希望多个请求并发执行，可以使用Promise.all方法。
+async function dbFuc(db) {
+  let docs = [{}, {}, {}];
+  let promises = docs.map((doc) => db.post(doc));
+
+  let results = await Promise.all(promises);
+  console.log(results);
+}
+// 或者使用下面的写法
+async function dbFuc(db) {
+  let docs = [{}, {}, {}];
+  let promises = docs.map((doc) => db.post(doc));
+
+  let results = [];
+  for (let promise of promises) {
+    results.push(await promise);
+  }
+  console.log(results);
+}
+
+// 接着是Generator函数的写法。
+function chainAnimationsGenerator(elem, animations) {
+  return spawn(function*() {
+    var ret = null;
+    try {
+      for(var anim of animations) {
+        ret = yield anim(elem);
+      }
+    } catch(e) {
+      /* 忽略错误，继续执行 */
+    }
+    return ret;
+  });
+}
+
+// 最后是Async函数的写法。
+async function chainAnimationsAsync(elem, animations) {
+  var ret = null;
+  try {
+    for(var anim of animations) {
+      ret = await anim(elem);
+    }
+  } catch(e) {
+    /* 忽略错误，继续执行 */
+  }
+  return ret;
+}
