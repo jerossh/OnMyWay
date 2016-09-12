@@ -229,3 +229,95 @@ Function.method('new', function () {
   var other = this.apply(that, argument);
   return (typeof other === "object" && other) || that     // 为什么会出现不是对象的情况？
 })
+
+
+// 原型
+var myMamMal = {
+  name: 'Herb the Mamal',
+  get_name: function () {
+    return this.name
+  },
+  says: function () {
+    return this.saying || ' '
+  }
+};
+var myCat = Object.create(myMamMal)
+myCat.name = 'Hnrietta'
+myCat.saying = 'meow'
+
+
+// 函数化
+// 函数化还给我们提供一个处理父类方法的方法
+Object.method('superior', function (name) {
+  var that = this,
+      method = that[name];
+  return function() {
+    return method.apply(that, arguments);
+  }
+})
+var coolcat = function (spec) {
+  var that = cat(spec),
+    super_get_name = that.superior('get_name');
+  that.get_name = function (n) {
+    return 'like' + super_get_name() + ' baby';   //  把方法封装到这个函数中
+  };
+  return that
+}
+var myCoolCat =coolcat({name: 'Bix'})
+var name = myCoolCat.get_name();
+
+
+// 部件
+var eventuality = function (that) {
+  var register = {}
+  that.fire = function(event) {
+    var array,
+        func,
+        handler,
+        i,
+        type = typeof event === 'string' ? event : event.type;
+
+    if (register.hasOwnProperty(type)) {
+      array = register[type];
+      for (i = 0; i < array.length; i++) {
+        handler = array[i];
+
+        func = handler.method
+        if (typeof func === 'string') {
+          func = this[func]
+        }
+        func.apply(this, handler.parameters || [event])
+      }
+    }
+    return this
+  }
+  that.on = function (type, method, parameters) {
+    var handler = {
+      method: method,
+      parameters: parameters,
+    };
+    if (register.hasOwnProperty(type)) {
+      register[type].push(handler)
+    } else {
+      register[type] = [hander]
+    }
+    return this
+  }
+  return that
+}
+
+
+
+// 数组
+// 方法
+Array.method('reduce', function(f, value) {
+  var i;
+  for (i = 0; i < this.length; i ++) {
+    value = f(this[i], value);
+  }
+  return value
+})
+
+
+// 正则表达式
+// 先跳过
