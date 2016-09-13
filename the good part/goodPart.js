@@ -324,3 +324,16 @@ Array.method('reduce', function(f, value) {
 
 
 // 方法 methods
+// unshift 返回的是新数组长度
+var arr = [1,2,3,4,5]
+var r = arr.unshift('-1','0')   // 7
+Number.toExponential()
+Number.toPrecision()
+
+
+
+// 代码风格
+
+
+
+// 优美的特性
