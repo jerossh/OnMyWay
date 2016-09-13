@@ -321,3 +321,6 @@ Array.method('reduce', function(f, value) {
 
 // 正则表达式
 // 先跳过
+
+
+// 方法 methods
