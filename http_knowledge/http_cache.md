@@ -35,5 +35,6 @@ HTTP协议头 Cache-Control 的值可以是 public、private、no-cache、no- st
   1. Etag/If-None-Match 同样需要配合 Cache-control 使用。
   2. Etag 服务器相应浏览器请求时，会告诉浏览器当前资源在服务的唯一标识，标识规则有服务器决定。If-None-Match 当资源过期时（即超过了max-age 定义的时间），发现资源具有 Etag 声明，则在再次向服务器发送求情时带上 If-None-Match（即本地缓存资源的 Etag 值）。服务器收到请求后如果发现有 If-None-Match 则与服务端被请求资源的 Etag 进行比对，如果相同则说明资源无更改并返回 304，否则返回 200 和新的资源。
 
-![cache](../images/priorty.png)
-可以看到 Etag 的优先级是大于 Last-Modified 的。
+![cache](../images/priority.png)
+
+上图可以看到 Etag 的优先级是大于 Last-Modified 的。
