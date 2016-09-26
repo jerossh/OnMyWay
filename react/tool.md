@@ -51,3 +51,20 @@ React.addons.TestUtils使得在你选择的测试框架中测试React组件变�
 ## 不可变数据的辅助工具
 
 ### 主要思想（The main idea）
+update()在这种情形下提供了简单的语法糖，使得写这种代码变得更加简单。代码变为：
+```js
+var newData = React.addons.update(myData, {
+  x: {y: {z: {$set: 7}}},
+  a: {b: {$push: [9]}}
+});
+```
+以$为前缀的键被称作命令。他们“改变”的数据结构被称为目标。(首 mongodb 查询更新启发)
+
+### 可用的命令（Available commands）
+
+- {$push: array} 利用push()把目标上所有的元素放进数组（push() all the items in array on the target.）。
+- {$unshift: array} 利用unshift()把目标上所有的元素放进数组（unshift() all the items in array on the target.）。
+- {$splice: array of arrays} 对于array中的每一个元素，用元素提供的参数在目标上调用splice()（for each item in arrays call splice() on the target with the parameters provided by the item.）。
+- {$set: any} 整体替换目标（replace the target entirely.）。
+- {$merge: object} 合并目标和object的键。
+- {$apply: function} 传入当前的值到函数，然后用新返回的值更新它（passes in the current value to the function and updates it with the new returned value.）。
