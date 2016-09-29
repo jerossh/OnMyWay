@@ -65,3 +65,98 @@ const action = addTodo('Learn Redux');
 #### store.dispatch()
 
 **store.dispatch()** 是 View 发出 Action 的唯一方法。
+
+#### Reducer
+
+Store 收到 Action 以后，必须给出一个新的 State，这样 View 才会发生变化。这种 State 的计算过程就叫做 Reducer。
+
+Reducer 是一个函数，它接受 Action 和当前 State 作为参数，返回一个新的 State。
+
+```js
+const reducer = function (state, action) {
+  // ...
+  return new_state;
+};
+```
+
+整个应用的初始状态，可以作为 State 的默认值。下面是一个实际的例子。
+
+```js
+const defaultState = 0;
+const reducer = (state = defaultState, action) => {
+  switch (action.type) {
+    case 'ADD':
+      return state + action.payload;
+    default:
+      return state;
+  }
+};
+
+const state = reducer(1, {
+  type: 'ADD',
+  payload: 2
+});
+```
+
+上面代码中，reducer函数收到名为ADD的 Action 以后，就返回一个新的 State，作为加法的计算结果。其他运算的逻辑（比如减法），也可以根据 Action 的不同来实现。
+
+实际应用中，Reducer 函数不用像上面这样手动调用，store.dispatch方法会触发 Reducer 的自动执行。为此，Store 需要知道 Reducer 函数，做法就是在生成 Store 的时候，将 Reducer 传入createStore方法。
+
+```js
+import { createStore } from 'redux';
+const store = createStore(reducer);
+```
+
+上面代码中，createStore接受 Reducer 作为参数，生成一个新的 Store。以后每当store.dispatch发送过来一个新的 Action，就会自动调用 Reducer，得到新的 State。
+
+为什么这个函数叫做 Reducer 呢？因为它可以作为数组的reduce方法的参数。请看下面的例子，一系列 Action 对象按照顺序作为一个数组。
+
+```js
+const actions = [
+  { type: 'ADD', payload: 0 },
+  { type: 'ADD', payload: 1 },
+  { type: 'ADD', payload: 2 }
+];
+
+const total = actions.reduce(reducer, 0); // 3
+```
+
+上面代码中，数组actions表示依次有三个 Action，分别是加0、加1和加2。数组的reduce方法接受 Reducer 函数作为参数，就可以直接得到最终的状态3。
+
+#### 纯函数
+
+Reducer 函数最重要的特征是，它是一个纯函数。也就是说，只要是同样的输入，必定得到同样的输出。
+
+纯函数是函数式编程的概念，必须遵守以下一些约束。
+- 不得改写参数
+- 不能调用系统 I/O 的API
+- 不能调用Date.now()或者Math.random()等不纯的方法，因为每次会得到不一样的结果
+
+由于 Reducer 是纯函数，就可以保证同样的State，必定得到同样的 View。但也正因为这一点，Reducer 函数里面不能改变 State，必须返回一个全新的对象，请参考下面的写法。
+
+```js
+// State 是一个对象
+function reducer(state, action) {
+  return Object.assign({}, state, { thingToChange });
+  // 或者
+  return { ...state, ...newState };
+}
+
+// State 是一个数组
+function reducer(state, action) {
+  return [...state, newItem];
+}
+```
+
+最好把 State 对象设成只读。你没法改变它，要得到新的 State，唯一办法就是生成一个新对象。这样的好处是，任何时候，与某个 View 对应的 State 总是一个不变的对象。
+
+#### store.subscribe()
+
+Store 允许使用store.subscribe方法设置监听函数，一旦 State 发生变化，就自动执行这个函数。
+
+```js
+import { createStore } from 'redux';
+const store = createStore(reducer);
+
+store.subscribe(listener);
+```
