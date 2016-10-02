@@ -160,3 +160,82 @@ const store = createStore(reducer);
 
 store.subscribe(listener);
 ```
+显然，只要把 View 的更新函数（对于 React 项目，就是组件的render方法或setState方法）放入listen，就会实现 View 的自动渲染。
+
+store.subscribe方法返回一个函数，调用这个函数就可以解除监听。
+
+```js
+let unsubscribe = store.subscribe(() =>
+  console.log(store.getState())
+);
+
+unsubscribe();
+```
+
+## Store 的实现
+
+上一节介绍了 Redux 涉及的基本概念，可以发现 Store 提供了三个方法。
+
+- store.getState()
+- store.dispatch()
+- store.subscribe()
+
+```js
+import { createStore } from 'redux';
+let { subscribe, dispatch, getState } = createStore(reducer);
+```
+
+**createStore** 方法还可以接受第二个参数，表示 State 的最初状态。这通常是服务器给出的。
+
+```js
+let store = createStore(todoApp, window.STATE_FROM_SERVER)
+```
+上面代码中，window.STATE_FROM_SERVER就是整个应用的状态初始值。注意，如果提供了这个参数，它会覆盖 Reducer 函数的默认初始值。
+
+下面是createStore方法的一个简单实现，可以了解一下 Store 是怎么生成的。
+```js
+const createStore = (reducer) => {
+  let state;
+  let listeners = [];
+  const getState = () => state;
+  const dispatch = (action) => {
+    state = reducer(state, action);
+    listeners.forEach(listener => listener());
+  };
+  const subscribe = (listener) => {
+    listeners.push(listener);
+    return () => {
+      listeners = listeners.filter(l => l !== listener);
+    }
+  };
+  dispatch({});
+return { getState, dispatch, subscribe };
+};
+```
+
+## Reducer 的拆分
+
+Reducer 函数负责生成 State。由于整个应用只有一个 State 对象，包含所有数据，对于大型应用来说，这个 State 必然十分庞大，导致 Reducer 函数也十分庞大。
+
+请看下面的例子。
+
+```js
+const chatReducer = (state = defaultState, action = {}) => {
+  const { type, payload } = action;
+  switch (type) {
+    case ADD_CHAT:
+      return Object.assign({}, state, {
+        chatLog: state.chatLog.concat(payload)
+      });
+    case CHANGE_STATUS:
+      return Object.assign({}, state, {
+        statusMessage: payload
+      });
+    case CHANGE_USERNAME:
+      return Object.assign({}, state, {
+        userName: payload
+      });
+    default: return state;
+  }
+};
+```
