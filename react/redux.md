@@ -239,3 +239,37 @@ const chatReducer = (state = defaultState, action = {}) => {
   }
 };
 ```
+
+上面代码中，三种 Action 分别改变 State 的三个属性。
+
+- ADD_CHAT：chatLog属性
+- CHANGE_STATUS：statusMessage属性
+- CHANGE_USERNAME：userName属性
+
+这三个属性之间没有联系，这提示我们可以把 Reducer 函数拆分。不同的函数负责处理不同属性，最终把它们合并成一个大的 Reducer 即可。
+
+```js
+const chatReducer = (state = defaultState, action = {}) => {
+  return {
+    chatLog: chatLog(state.chatLog, action),
+    statusMessage: statusMessage(state.statusMessage, action),
+    userName: userName(state.userName, action)
+  }
+};
+```
+
+Redux 提供了一个 **combineReducers** 方法，用于 Reducer 的拆分。你只要定义各个子 Reducer 函数，然后用这个方法，将它们合成一个大的 Reducer。
+
+```js
+import { combineReducers } from 'redux';
+
+const chatReducer = combineReducers({
+  chatLog,
+  statusMessage,
+  userName
+})
+
+export default todoApp;
+```
+
+上面的代码通过combineReducers方法将三个子 Reducer 合并成一个大的函数。
