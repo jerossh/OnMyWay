@@ -273,3 +273,132 @@ export default todoApp;
 ```
 
 上面的代码通过combineReducers方法将三个子 Reducer 合并成一个大的函数。
+
+这种写法有一个前提，就是 State 的属性名必须与子 Reducer 同名。如果不同名，就要采用下面的写法。
+
+```js
+const reducer = combineReducers({
+  a: doSomethingWithA,
+  b: processB,
+  c: c
+})
+
+// 等同于
+function reducer(state = {}, action) {
+  return {
+    a: doSomethingWithA(state.a, action),
+    b: processB(state.b, action),
+    c: c(state.c, action)
+  }
+}
+```
+
+总之，combineReducers()做的就是产生一个整体的 Reducer 函数。该函数根据 State 的 key 去执行相应的子 Reducer，并将返回结果合并成一个大的 State 对象。
+
+下面是combineReducer的简单实现。
+```js
+const combineReducers = reducers => {
+  return (state = {}, action) => {
+    return Object.keys(reducers).reduce(
+      (nextState, key) => {
+        nextState[key] = reducers[key](state[key], action);
+        return nextState;
+      },
+      {}
+    );
+  };
+};
+```
+
+你可以把所有子 Reducer 放在一个文件里面，然后统一引入。
+
+```js
+import { combineReducers } from 'redux'
+import * as reducers from './reducers'
+
+const reducer = combineReducers(reducers)
+```
+
+## 工作流程
+
+首先，用户发出 Action。
+
+```js
+store.dispatch(action);
+```
+
+然后，Store 自动调用 Reducer，并且传入两个参数：当前 State 和收到的 Action。 Reducer 会返回新的 State 。
+
+```js
+let nextState = todoApp(previousState, action);
+```
+
+State 一旦有变化，Store 就会调用监听函数。
+
+```js
+// 设置监听函数
+store.subscribe(listener);
+```
+
+listener可以通过store.getState()得到当前状态。如果使用的是 React，这时可以触发重新渲染 View。
+
+```js
+function listerner() {
+  let newState = store.getState();
+  component.setState(newState);   
+}
+```
+
+## 实例：计数器
+
+```js
+const Counter = ({ value }) => (
+  <h1>{value}</h1>
+);
+
+const render = () => {
+  ReactDOM.render(
+    <Counter value={store.getState()}/>,
+    document.getElementById('root')
+  );
+};
+
+store.subscribe(render);
+render();
+```
+
+上面是一个简单的计数器，唯一的作用就是把参数value的值，显示在网页上。Store 的监听函数设置为render，每次 State 的变化都会导致网页重新渲染。
+
+下面加入一点变化，为Counter添加递增和递减的 Action。
+```js
+
+const Counter = ({ value }) => (
+  <h1>{value}</h1>
+  <button onClick={onIncrement}>+</button>
+  <button onClick={onDecrement}>-</button>
+);
+
+const reducer = (state = 0, action) => {
+  switch (action.type) {
+    case 'INCREMENT': return state + 1;
+    case 'DECREMENT': return state - 1;
+    default: return state;
+  }
+};
+
+const store = createStore(reducer);
+
+const render = () => {
+  ReactDOM.render(
+    <Counter
+      value={store.getState()}
+      onIncrement={() => store.dispatch({type: 'INCREMENT'})}
+      onDecrement={() => store.dispatch({type: 'DECREMENT'})}
+    />,
+    document.getElementById('root')
+  );
+};
+
+render();
+store.subscribe(render);
+```
