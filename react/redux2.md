@@ -169,3 +169,106 @@ store.dispatch(fetchPosts('reactjs')).then(() =>
   console.log(store.getState())
 );
 ```
+上面代码中，fetchPosts是一个Action Creator（动作生成器），返回一个函数。这个函数执行后，先发出一个Action（requestPosts(postTitle)），然后进行异步操作。拿到结果后，先将结果转成 JSON 格式，然后再发出一个 Action（ receivePosts(postTitle, json)）。
+
+上面代码中，有几个地方需要注意。
+
+1. fetchPosts返回了一个函数，而普通的 Action Creator 默认返回一个对象。
+- 返回的函数的参数是dispatch和getState这两个 Redux 方法，普通的 Action Creator 的参数是 Action 的内容。
+- 在返回的函数之中，先发出一个 Action（requestPosts(postTitle)），表示操作开始。
+- 异步操作结束之后，再发出一个 Action（receivePosts(postTitle, json)），表示操作结束
+
+这样的处理，就解决了自动发送第二个 Action 的问题。但是，又带来了一个新的问题，Action 是由store.dispatch方法发送的。而store.dispatch方法正常情况下，参数只能是对象，不能是函数。
+
+这时，就要使用中间件 **redux-thunk**。
+
+```js
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import reducer from './reducers';
+
+// Note: this API requires redux@>=3.1.0
+const store = createStore(
+  reducer,
+  applyMiddleware(thunk)
+);
+```
+上面代码使用redux-thunk中间件，改造store.dispatch，使得后者可以接受函数作为参数。
+
+因此，异步操作的第一种解决方案就是，写出一个返回函数的 Action Creator，然后使用redux-thunk中间件改造store.dispatch。
+
+## redux-promise 中间件
+
+既然 Action Creator 可以返回函数，当然也可以返回其他值。另一种异步操作的解决方案，就是让 Action Creator 返回一个 Promise 对象。
+```js
+import { createStore, applyMiddleware } from 'redux';
+import promiseMiddleware from 'redux-promise';
+import reducer from './reducers';
+
+const store = createStore(
+  reducer,
+  applyMiddleware(promiseMiddleware)
+);
+```
+这个中间件使得 **store.dispatch** 方法可以接受 Promise 对象作为参数。这时，Action Creator 有两种写法。写法一，返回值是一个 Promise 对象。
+
+```js
+const fetchPosts =
+  (dispatch, postTitle) => new Promise(function (resolve, reject) {
+     dispatch(requestPosts(postTitle));
+     return fetch(`/some/API/${postTitle}.json`)
+       .then(response => {
+         type: 'FETCH_POSTS',
+         payload: response.json()
+       });
+});
+```
+写法二，Action 对象的payload属性是一个 Promise 对象。这需要从redux-actions模块引入createAction方法，并且写法也要变成下面这样。
+
+```js
+import { createAction } from 'redux-actions';
+
+class AsyncApp extends Component {
+  componentDidMount() {
+    const { dispatch, selectedPost } = this.props
+    // 发出同步 Action
+    dispatch(requestPosts(selectedPost));
+    // 发出异步 Action
+    dispatch(createAction(
+      'FETCH_POSTS',
+      fetch(`/some/API/${postTitle}.json`)
+        .then(response => response.json())
+    ));
+  }
+}
+```
+
+上面代码中，第二个dispatch方法发出的是异步 Action，只有等到操作结束，这个 Action 才会实际发出。注意，createAction的第二个参数必须是一个 Promise 对象。
+
+看一下redux-promise的[源码](https://github.com/acdlite/redux-promise/blob/master/src/index.js)，就会明白它内部是怎么操作的。
+
+```js
+export default function promiseMiddleware({ dispatch }) {
+  return next => action => {
+    if (!isFSA(action)) {
+      return isPromise(action)
+        ? action.then(dispatch)
+        : next(action);
+    }
+
+    return isPromise(action.payload)
+      ? action.payload.then(
+          result => dispatch({ ...action, payload: result }),
+          error => {
+            dispatch({ ...action, payload: error, error: true });
+            return Promise.reject(error);
+          }
+        )
+      : next(action);
+  };
+}
+```
+
+从上面代码可以看出，如果 Action 本身是一个 Promise，它 resolve 以后的值应该是一个 Action 对象，会被dispatch方法送出（action.then(dispatch)），但 reject 以后不会有任何动作；如果 Action 对象的payload属性是一个 Promise 对象，那么无论 resolve 和 reject，dispatch方法都会发出 Action。
+
+中间件和异步操作，就介绍到这里。下一篇文章将是最后一部分，介绍如何使用react-redux这个库。
