@@ -250,3 +250,33 @@ scripts: {
 上面代码中，npm_package_scripts_install变量的值等于foo.js。
 
 然后，npm 脚本还可以通过 **npm_config_** 前缀，拿到 npm 的配置变量，即 **npm config get xxx** 命令返回的值。比如，当前模块的发行标签，可以通过 **npm_config_tag** 取到。
+
+## 常用脚本示例
+
+```
+// 删除目录
+"clean": "rimraf dist/*",
+
+// 本地搭建一个 HTTP 服务
+"serve": "http-server -p 9090 dist/",
+
+// 打开浏览器
+"open:dev": "opener http://localhost:9090",
+
+// 实时刷新
+ "livereload": "live-reload --port 9091 dist/",
+
+// 构建 HTML 文件
+"build:html": "jade index.jade > dist/index.html",
+
+// 只要 CSS 文件有变动，就重新执行构建
+"watch:css": "watch 'npm run build:css' assets/styles/",
+
+// 只要 HTML 文件有变动，就重新执行构建
+"watch:html": "watch 'npm run build:html' assets/html",
+
+// 部署到 Amazon S3
+"deploy:prod": "s3-cli sync ./dist/ s3://example-com/prod-site/",
+
+// 构建 favicon
+```
