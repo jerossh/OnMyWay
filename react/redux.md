@@ -8,7 +8,7 @@
 #### Store
 
 Store 就是保存数据的地方，你可以把它看成一个容器。整个应用只能有一个 Store。
-Redux 提供createStore这个函数，用来生成 Store。
+Redux 提供 **createStore** 这个函数，用来生成 Store。
 
 ```js
 import { createStore } from 'redux';
@@ -21,7 +21,7 @@ const store = createStore(fn);
 
 Store对象包含所有数据。如果想得到某个时点的数据，就要对 Store 生成快照。这种时点的数据集合，就叫做 State。
 
-当前时刻的 State，可以通过store.getState()拿到。
+当前时刻的 State，可以通过 **store.getState()** 拿到。
 
 ```js
 import { createStore } from 'redux';
@@ -43,7 +43,7 @@ const action = {
 };
 ```
 
-上面代码中，Action 的名称是ADD_TODO，它携带的信息是字符串Learn Redux。
+上面代码中，Action 的名称是 **ADD_TODO**，它携带的信息是字符串 **Learn Redux**。
 
 可以这样理解，Action 描述当前发生的事情。改变 State 的唯一办法，就是使用 Action。它会运送数据到 Store。
 
@@ -61,6 +61,7 @@ function addTodo(text) {
 
 const action = addTodo('Learn Redux');
 ```
+上面代码中，**addTodo** 函数就是一个 Action Creator。
 
 #### store.dispatch()
 
