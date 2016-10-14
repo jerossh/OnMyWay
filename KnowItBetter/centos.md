@@ -82,5 +82,28 @@ bower install –allow-root
 
 ## 部署ftp
 
-使用vsftpd 和4db
+使用 **vsftpd** 和 **4db**
 可以访问根目录，但其他的还是有问题
+
+## 梯子
+
+putty
+```
+wget –no-check-certificate https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks-go.sh
+chmod +x shadowsocks-go.sh
+./shadowsocks-go.sh 2>&1 | tee shadowsocks-go.log
+```
+后台启动
+```
+shadowsocks-go
+```
+使用命令
+```
+启动：/etc/init.d/shadowsocks start
+停止：/etc/init.d/shadowsocks stop
+重启：/etc/init.d/shadowsocks restart
+状态：/etc/init.d/shadowsocks status
+```
+客户端
+
+[shadowsocks](https://sourceforge.net/projects/shadowsocksgui/files/dist/)
