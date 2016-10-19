@@ -25,6 +25,20 @@ location / {
     expires 7d;//设置静态文件7天过期
   }
 ```
+
+# 2
+```
+location ~ \.(jpg|png|jpeg|gif)$  {
+        expires 30d;
+        root   /data/www/wizzer.cn/;
+}
+
+location ~ \.(js|css)$  {
+        expires 2h;
+        root   /data/www/wizzer.cn/;
+}
+```
+
 ## Q&A
 
 #### Q:为什么在静态文件的location里还写着try_files $uri @nodejs;呢？

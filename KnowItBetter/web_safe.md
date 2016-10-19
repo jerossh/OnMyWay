@@ -6,8 +6,6 @@ CSP 的实质就是白名单制度，开发者明确告诉客户端，哪些外�
 
 #### 启用方式
 
-
-
 * HTTP 头信息
 
 ```
@@ -89,3 +87,5 @@ hash值：列出允许执行的脚本代码的Hash值，页面内嵌脚本的哈
   </script>
   ```
   上面的代码中，虽然加载的脚本来自当前域名，但是通过改写回调函数，攻击者依然可以执行恶意代码。
+
+  其他资料 参考[MDN CSP策略指令](https://developer.mozilla.org/zh-CN/docs/Web/Security/CSP/CSP_policy_directives)
