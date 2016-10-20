@@ -108,3 +108,37 @@ shadowsocks-go
 客户端
 
 [shadowsocks](https://sourceforge.net/projects/shadowsocksgui/files/dist/)
+
+## centos 常用
+
+修改 vi
+删除文件 rm
+删除文件夹 rm -rf
+
+## 国内主机的问题
+
+由于墙的问题，国内主机的npm install 命令经常失败
+而且淘宝的 cnpm 常用命令无法绑定
+```
+$ npm install -g cnpm --registry=https://registry.npm.taobao.org
+```
+以上会报错
+
+只能使用以下命令绑定 cnpm
+```
+alias cnpm="npm --registry=https://registry.npm.taobao.org \
+--cache=$HOME/.npm/.cache/cnpm \
+--disturl=https://npm.taobao.org/dist \
+--userconfig=$HOME/.cnpmrc"
+```
+
+愤怒，又因为墙的原因白忙活了一天。服务器尽量还是使用墙外的把。最好是对电信联通线路优化过的
+
+另外新增一个报错的提醒
+
+```
+nodejs出现events.js:72中抛出错误
+```
+一般表示端口被占用，新开一个端口即可～～～
+
+## 数据库备份
