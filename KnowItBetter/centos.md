@@ -78,7 +78,7 @@ git push
 ```
 #### bower
 ```
-bower install –allow-root
+bower install -–allow-root
 ```
 
 ## 部署ftp
