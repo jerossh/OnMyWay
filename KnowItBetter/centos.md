@@ -26,14 +26,6 @@ sudo yum install npm
 
 ## 如何在生产服务器上部署 Node.js 应用
 
-[知乎](https://www.zhihu.com/question/19887245)
-
-[pod](https://github.com/yyx990803/pod)
-
-```
-$ [sudo] npm install pod -g
-```
-
 ## 安装mongo
 
 网络上的教程大多不靠谱。
@@ -48,7 +40,7 @@ yum install mongodb-server
 ```
 安装工具包：
 ```
-yum install mongodb-server
+yum install mongodb
 ```
 
 启动：
@@ -65,10 +57,19 @@ service mongod start
 
 #### 如何使用 pod 构建
 
-服务器端
+[知乎](https://www.zhihu.com/question/19887245)
+
+[pod](https://github.com/yyx990803/pod)
+
+```
+$ [sudo] npm install pod -g
+```
+
+服务器端: 注意第一次要设置路径，否则可能没有访问权限
 ```
 pod create myapp
 ```
+
 电脑端
 ```
 git clone ssh://root@119.28.99.145/app/repos/myapp.git
