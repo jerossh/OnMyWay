@@ -10,7 +10,7 @@ yum install nginx
 service nginx start
 ```
 
-## 部署 node
+<!-- ## 部署 node
 你可以通过运行以下命令。
 ```
 sudo yum install epel-release
@@ -22,7 +22,47 @@ sudo yum install nodejs
 因为在开发过程中我需要管理节点包，我还要安装新公共管理的软件包管理器，使用以下命令。
 ```
 sudo yum install npm
+``` -->
+
+## 部署node
+<!-- 直接通过
 ```
+sudo yum install nodejs
+```
+版本太老，不知道多久没更新了
+
+所以还是获取的形式更新.
+
+准备命令 wget
+```
+yum -y install gcc make gcc-c++ openssl-devel wget
+```
+下载并解压
+```
+wget https://nodejs.org/dist/v6.2.0/node-v6.2.0.tar.gz
+tar -zvxf node-v6.2.0.tar.gz
+```
+编译以及安装
+```
+make && make install
+```
+验证是否安装配置成功：
+```
+node -v
+``` -->
+## 用 n 更新或操作 node
+
+```
+n stable
+n latest
+n 版本号
+n         
+n rm 版本号
+```
+
+- n 用 npm 安装
+- npm 用 yum 安装
+
 
 ## 如何在生产服务器上部署 Node.js 应用
 
@@ -109,11 +149,6 @@ shadowsocks-go
 
 [shadowsocks](https://sourceforge.net/projects/shadowsocksgui/files/dist/)
 
-## centos 常用
-
-修改 vi
-删除文件 rm
-删除文件夹 rm -rf
 
 ## 国内主机的问题
 
@@ -134,11 +169,27 @@ alias cnpm="npm --registry=https://registry.npm.taobao.org \
 
 愤怒，又因为墙的原因白忙活了一天。服务器尽量还是使用墙外的把。最好是对电信联通线路优化过的
 
-另外新增一个报错的提醒
 
-```
-nodejs出现events.js:72中抛出错误
-```
-一般表示端口被占用，新开一个端口即可～～～
+## yum 使用阿里云
 
-## 数据库备份
+阿里云是最近新出的一个镜像源。得益与阿里云的高速发展，这么大的需求，肯定会推出自己的镜像源。
+阿里云Linux安装镜像源地址：http://mirrors.aliyun.com/
+CentOS系统更换软件安装源
+第一步：备份你的原镜像文件，以免出错后可以恢复。
+```
+mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+```
+第二步：下载新的CentOS-Base.repo 到/etc/yum.repos.d/
+```
+CentOS 5
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-5.repo
+CentOS 6
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo
+CentOS 7
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+```
+第三步：运行yum makecache生成缓存
+```
+yum clean all
+yum makecache
+```
