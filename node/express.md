@@ -29,6 +29,7 @@ app 对象 如下有方法：
 - 渲染 html: app.render
 - 注册文本模版: app.engine
 
+
 ## 属性
 
 ### app.locals
