@@ -78,4 +78,4 @@ gulp.task('browser-sync', function() {
  })
  ```
 
- 基本的刷新就完成了
+ 基本的重启、刷新功能就完成了

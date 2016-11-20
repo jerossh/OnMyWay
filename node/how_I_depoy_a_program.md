@@ -1,4 +1,5 @@
 ```
-set NODE_ENV=production
+NODE_ENV=production
 ```
 或者
+pm2

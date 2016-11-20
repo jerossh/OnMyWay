@@ -66,7 +66,7 @@ n rm 版本号
 
 ## 如何在生产服务器上部署 Node.js 应用
 
-## 安装mongo
+#### 安装mongo
 
 网络上的教程大多不靠谱。
 
@@ -109,6 +109,10 @@ $ [sudo] npm install pod -g
 ```
 pod create myapp
 ```
+创建文记得修改 vi .podrc
+
+[具体案例](https://github.com/yyx990803/pod#configuration)
+记得 上线解析好的域名 设置 *NODE_ENV=production*
 
 电脑端
 ```
@@ -116,9 +120,13 @@ git clone ssh://root@119.28.99.145/app/repos/myapp.git
 ...
 git push
 ```
-#### bower
+
+配置 .podhook
+
 ```
+cnpm install
 bower install -–allow-root
+pod start 项目名称
 ```
 
 ## 部署ftp
