@@ -38,3 +38,11 @@ HTTP协议头 Cache-Control 的值可以是 public、private、no-cache、no- st
 ![cache](../images/priority.png)
 
 上图可以看到 Etag 的优先级是大于 Last-Modified 的。
+
+简单的可以在 html内设置
+```html
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+```
+相关语言设置可以在[这里看到](http://stackoverflow.com/questions/49547/making-sure-a-web-page-is-not-cached-across-all-browsers)
