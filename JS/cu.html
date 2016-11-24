@@ -1,0 +1,25 @@
+<div id="outer" style="background:#099">
+          click outer
+         <p id="inner" style="background:#9C0">click inner</p>
+         <br>
+     </div>
+
+     <script type="text/javascript">
+      function G(id){
+          return document.getElementById(id);
+     }
+     function addEvent(obj, ev, handler){
+         if(window.attachEvent){
+             obj.attachEvent("on" + ev, handler);
+         }else if(window.addEventListener){
+            obj.addEventListener(ev, handler, false);
+        }
+     }
+     function test(e){
+         alert("e.target.tagName : " + e.target.tagName + "\n e.currentTarget.tagName : " + e.currentTarget.tagName);
+    }
+    var outer = G("outer");
+     var inner = G("inner");
+     //addEvent(inner, "click", test);
+     addEvent(outer, "click", test);
+     </script>

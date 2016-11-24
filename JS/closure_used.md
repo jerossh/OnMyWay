@@ -123,4 +123,13 @@ print(jack.getName());
 // john  
 // default  
 // jack  
+
+function f1(){
+　　　　var n=999;
+　　　　nAdd=function(){ return n+=1}
+　　}
+　　var result=f1();
+　　result(); // 999
+　　nAdd();
+　　result(); // 1000
 ```
