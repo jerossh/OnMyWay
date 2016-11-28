@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+
+</body>
+<script>
+  var ali = document.getElemetsByTagName('li')
+  for(var i = 0; i < ali.length; i++) {
+    ali[i].timer = null
+    ali[i].onmouseover = function() {
+      startMove(this, 400);
+    }
+    ali[i].onmouseout = function() {
+      startMove(this, 200);
+    }
+
+    var timer = null
+    function startMove(obj, tar) {
+      clearInterval(obj.timer);
+      obj.timer = setInterval(function() {
+        var speed = (tar-obj.offsetWidth)/20
+        speed = speed > 0?Math.ceil(speed):Math.floor.(speed)
+        if(obj.offsetWidth == tar) {
+          clearInterval(obj.timer)
+        } else {
+          obj.style.width = obj.offsetWidth + speed +'px';
+        }
+      }, 15)
+    }
+  }
+
+  // 获得css里的样式
+  function getStyle(obj, attr) {
+    if (obj.currentStyle) {
+      return obj.currentStyle[attr];
+    }
+    else {
+      return getComputedStyle(obj,false)[attr];
+    }
+  }
+
+</script>
+</html>

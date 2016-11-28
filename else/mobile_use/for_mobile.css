@@ -1,0 +1,126 @@
+1. 移动端字体使用
+2. 重置点击效果
+3. 表单样式重置 
+4. 移动端字体大小单位选择
+5. 滚动条设置
+6. 用户操作
+7. 表单占字符设置
+8. 开启硬件加速
+9. Rentina显示屏原理及设计方案 
+
+1. 移动端字体使用
+body { font-family: "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif; } 
+
+
+2. 重置点击效果
+/*.点击元素产生背景或边框怎么去掉 */
+/*ios用户点击一个链接，会出现一个半透明灰色遮罩, 如果想要禁用，可设置-webkit-tap-highlight-color的alpha值为0去除灰色半透明遮罩；*/
+/*android用户点击一个链接，会出现一个边框或者半透明灰色遮罩, 不同生产商定义出来额效果不一样，可设置-webkit-tap-highlight-color的alpha值为0去除部分机器自带的效果；*/
+/*winphone系统,点击标签产生的灰色半透明背景，能通过设置<meta name="msapplication-tap-highlight" content="no">去掉；*/
+/*特殊说明：有些机型去除不了，如小米2。对于按钮类还有个办法，不使用a或者input标签，直接用div标签*/
+
+a,button,input,textarea { 
+    -webkit-tap-highlight-color: rgba(0,0,0,0); 
+    -webkit-user-modify:read-write-plaintext-only; //-webkit-user-modify有个副作用，就是输入法不再能够输入多个字符
+}   
+ /*也可以 */
+* { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+/*winphone下<meta name="msapplication-tap-highlight" content="no">*/
+
+
+3. 表单样式重置 
+/*一、使用appearance改变webkit浏览器的默认外观*/
+input,select { -webkit-appearance:none; appearance: none; }
+
+/*winphone下，使用伪元素改变表单元素默认外观*/
+/*1.禁用select默认箭头，::-ms-expand修改表单控件下拉箭头，设置隐藏并使用背景图片来修饰*/
+select::-ms-expand { display:none; }
+
+/*2.禁用radio和checkbox默认样式，::-ms-check修改表单复选框或单选框默认图标，设置隐藏并使用背景图片来修饰*/
+input[type=radio]::-ms-check,
+input[type=checkbox]::-ms-check { display:none; }
+
+/*3.禁用pc端表单输入框默认清除按钮，::-ms-clear修改清除按钮，设置隐藏并使用背景图片来修饰*/
+input[type=text]::-ms-clear,
+input[type=tel]::-ms-clear,
+input[type=number]::-ms-clear { display:none; }
+
+
+4. 移动端字体大小单位选择
+/* 移动端字体单位font-size选择px还是rem */
+
+ /*如需适配多种移动设备，建议使用rem。以下为参考值：*/
+html { font-size: 62.5%; }   //10*16 = 62.5%
+/*设置12px字体   这里注意在rem前要加上对应的px值，解决不支持rem的浏览器的兼容问题，做到优雅降级*/
+body { font-size:12px; font-size:1.2rem; } 
+
+
+5. 滚动条设置
+/*去掉webkit的滚动条——display: none;*/
+/*其他参数*/
+::-webkit-scrollba //滚动条整体部分
+::-webkit-scrollbar-thumb   //滚动条内的小方块
+::-webkit-scrollbar-track   //滚动条轨道
+::-webkit-scrollbar-button  //滚动条轨道两端按钮
+::-webkit-scrollbar-track-piece  //滚动条中间部分，内置轨道
+::-webkit-scrollbar-corner       //边角，两个滚动条交汇处
+::-webkit-resizer            //两个滚动条的交汇处上用于通过拖动调整元素大小的小控件
+
+
+
+6. 用户操作
+ /*禁止长按链接与图片弹出菜单*/
+a,img { -webkit-touch-callout: none }    
+// 禁止ios和android用户选中文字
+html,body {-webkit-user-select:none; user-select: none; }
+
+
+
+7. 表单占字符设置
+ /*改变输入框placeholder的颜色值*/
+::-webkit-input-placeholder { /* WebKit browsers */
+color: #999; }
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+color: #999; }
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+color: #999; }
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+color: #999; }
+input:focus::-webkit-input-placeholder{ color:#999; }
+ /*android上去掉语音输入按钮*/
+input::-webkit-input-speech-button {display: none}
+ /*阻止windows Phone的默认触摸事件*/
+/*说明：winphone下默认触摸事件事件使用e.preventDefault是无效的，*/
+
+
+
+
+8. 开启硬件加速
+/*目前，像Chrome/Filefox/Safari/IE9+以及最新版本Opera都支持硬件加速，当检测到某个DOM元素应用了某些CSS规则时就会自动开启，从而解决页面闪白，保证动画流畅。*/
+.css {
+    -webkit-transform: translate3d(0,0,0);
+    -moz-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+}
+
+
+
+9. Rentina显示屏原理及设计方案 
+
+/*  说明：retina屏是一种具备超高像素密度的液晶屏，同样大小的屏幕上显示的像素点由1个变为多个，如在同样带下的屏幕上，苹果设备的retina显示屏中，像素点1个变为4个。
+在高清显示屏中的位图被放大，图片会变得模糊，因此移动端的视觉稿通常会设计为传统PC的2倍。
+那么，前端的应对方案是：设计稿切出来的图片长宽保证为偶数，并使用backgroud-size把图片缩小为原来的1/2*/
+
+/*例如图片宽高为：200px*200px，那么写法如下*/
+.css{width:100px;height:100px;background-size:100px 100px;}
+/*其它元素的取值为原来的1/2，例如视觉稿40px的字体，使用样式的写法为20px*/
+.css{font-size:20px}
+/*image-set设计Rentina背景图，image-set,webkit私有属性，也是CSS4的属性，为解决Rentina屏幕下的图像而生。*/
+.css {
+    background: url(images/bg.jpg) no-repeat center;
+    background: -webkit-image-set(
+    url(images/bg.jpg) 1x,     //支持image-set普通屏
+    url(images/bg-2x.jpg) 2x); //支持image-set的Rentinan
+}
+
