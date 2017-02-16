@@ -25,11 +25,21 @@ sudo yum install npm
 ``` -->
 
 ## 部署node
-<!-- 直接通过
+直接通过
 ```
 sudo yum install nodejs
 ```
-版本太老，不知道多久没更新了
+版本太老，不知道多久没更新了, 可以添加新的源
+```
+# 4.x
+curl --silent --location https://rpm.nodesource.com/setup_4.x | bash -
+# 5.x
+curl --silent --location https://rpm.nodesource.com/setup_5.x | bash -
+# 6.x
+curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -
+# 7.x
+curl --silent --location https://rpm.nodesource.com/setup_7.x | bash -
+```
 
 所以还是获取的形式更新.
 
@@ -49,8 +59,8 @@ make && make install
 验证是否安装配置成功：
 ```
 node -v
-``` -->
-## 用 n 更新或操作 node
+```
+#### 用 n 更新或操作 node
 
 ```
 n stable
@@ -62,6 +72,21 @@ n rm 版本号
 
 - n 用 npm 安装
 - npm 用 yum 安装
+
+#### 用 nvm 部署 node
+
+由于 n 的方式部署node 连接失败后产生严重后果，2017年2月 折腾了一天后 使用 nvm 重新部署
+
+```
+<!-- 获取 -->
+wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+
+<!-- 安装nvm -->
+command -v nvm
+
+<!-- 安装 node  -->
+nvm install node
+```
 
 
 ## 如何在生产服务器上部署 Node.js 应用
@@ -128,6 +153,12 @@ cnpm install
 bower install -–allow-root
 pod start 项目名称
 ```
+
+#### 使用原生 pm2
+
+由于pod 一年多没有更新且 内置的 pm2过于老旧 建议 用 原生pm2 代替。
+原生pm2 语法与pod 类似，切换起来没有难度。
+pod目前 仅用于 git 的作用
 
 ## 部署ftp
 
