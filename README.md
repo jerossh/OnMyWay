@@ -12,3 +12,8 @@
 ### 2016-09-11
 
 * javascript: the good part
+
+# toDoList
+- [ ] 微信小程序
+- [x] pwa 规范
+- [ ] ReactNative
