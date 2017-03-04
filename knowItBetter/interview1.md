@@ -63,7 +63,7 @@ if (!Function.prototype.bind) {
          }
 
          var aArgs = Array.prototype.slice.call(arguments, 1),  // 截取第一个参数
-             fToBind = this,
+             fToBind = this,  // 用于 fbound 函数内
              fNOP = function () {},
              fBound = function () {
                  return fToBind.apply(this instanceof fNOP?this:oThis || this,
