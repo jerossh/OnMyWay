@@ -77,6 +77,24 @@ if (!Function.prototype.bind) {
 }
 ```
 
+## 计算最终样式
+
+可以使用 window.getComputedStyle('元素', '伪类')，或 ie 的 ele.currentStyle
+```js
+var dom = document.querySelector('#adZhuFengFloat');
+var getStyle = window.getComputedStyle || document.defaultView.getComputedStyle;  // 后面兼容 老版本 ff
+getStyle(dom)['float']  //  也可以使用 getPropertyValue 方法， IE getAttribute 驼峰写法
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
