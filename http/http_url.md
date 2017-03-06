@@ -8,7 +8,7 @@
 ```
 http://host[":"port][abs_path]
 ```
-1. http表示要通过HTTP协议来定位网络资源
-2. host表示合法的Internet主机域名或者IP地址
-3. port指定一个端口号，为空则使用缺省端口80
-4. abs_path指定请求资源的 URI。如果URL中没有给出abs_path，那么当它作为请求URI时，必须以“/”的形式给出，通常这个工作浏览器自动帮我们完成。
+1. http 表示要通过HTTP协议来定位网络资源
+2. host 表示合法的Internet主机域名或者IP地址
+3. port 指定一个端口号，为空则使用缺省端口80
+4. abs_path 指定请求资源的 URI。如果URL中没有给出abs_path，那么当它作为请求URI时，必须以“/”的形式给出，通常这个工作浏览器自动帮我们完成。
