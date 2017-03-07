@@ -86,6 +86,78 @@ var getStyle = window.getComputedStyle || document.defaultView.getComputedStyle;
 getStyle(dom)['float']  //  也可以使用 getPropertyValue 方法， IE getAttribute 驼峰写法
 ```
 
+## 盒模型
+ie的 width 包含了 padding，border
+
+## flex
+- flex-direction
+- flex-wrap 是否换行
+- flex-flow： direction和wrap 的简写
+- justify-content
+- align-items
+- align-content 
+
+项目属性：
+- order
+- flex-grow
+- flex-shrink
+- flex-basis
+- flex: flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选。
+- align-self, 覆盖 父属性的 align-items, 可以单个不对齐
+
+## prototype 与 __proto__
+
+__proto__ 是原型,prototype是函数默认的一个属性,它指向一个对象,这个对象的constructor属性指向函数本身.
+
+## new到底发生了什么
+
+function A () {}
+
+var o = new Object();
+o. __proto__ = A.prototype;//这里还记得之那个function里面的默认的属性么?
+A.call(o)//由于这里this是指向o,可以把什么this.name/getName绑定到o上.
+把这个o返回给a;//完成var a = new A()的过程.
+
+这里注意下,上面所谓的第4步其实是一个简化的说法.真正的过程是在第3步之后,如果发现A返回是一个Object类型(非primitive类型,即非string,boolean,number,null,undefined类型就是Object类型),则直接返回A的返回值,否则把第1步new的Object返回出去.(默认情况下,JS中函数默认返回值是undefined)举个例子
+
+```js
+function A(name){
+	this.name = name;
+	this.getName = function(){
+		console.log(this.name);
+	}
+
+	var b = 'test';
+	console.log(b);
+
+	return {};
+}
+
+var a = new A('testa');//{}
+```
+
+这里我们把A函数的返回值设置为一个Object类型,则这个时候执行new A返回的就是A函数的返回值{}.如果我们把A的返回值设置为return [];那么我们在new A的时候也相应的得到一个空数组.
+
+用 stackoverflow 上一个人的回答来总结下就是:
+
+In JavaScript, most functions are both callable and instantiable: they have both a [[Call]] and [[Construct]] internal methods.
+
+在JS中,绝大多数的函数都是既可以调用也可以实例化的.我们既可以直接执行函数得到函数的返回值.也可以通过new操作符得到一个对象.
+
+
+
+## this的理解
+
+this是Javascript语言的一个关键字它代表函数运行时，自动生成的一个内部对象，只能在函数内部使用,下面分四种情况，详细讨论this的用法，感兴趣的朋友可以了解下
+一般存在四种状态
+1. 纯函数，纯函数调用，直接指向 window
+2. 对象方法，指向该对象
+3. 构造函数，new 生成一个新对象， this 指向这个新对象
+4. call, apply 调用，指向调用的第一个参数
+
+
+
+
 
 
 
