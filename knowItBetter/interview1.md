@@ -155,7 +155,29 @@ this是Javascript语言的一个关键字它代表函数运行时，自动生成
 3. 构造函数，new 生成一个新对象， this 指向这个新对象
 4. call, apply 调用，指向调用的第一个参数
 
+## 从输入url到渲染的整个过程
 
+https://segmentfault.com/q/1010000000489803
+
+## 三次握手
+
+http://blog.csdn.net/whuslei/article/details/6667471/
+
+## 跨域
+
+http://www.cnblogs.com/2050/p/3191744.html
+
+## 懒加载和预加载
+
+http://www.jianshu.com/p/4876a4fe7731
+
+## BFC
+
+http://web.jobbole.com/84808/
+
+## bootstrap是怎么实现grid系统的
+
+http://www.jb51.net/article/93910.htm
 
 
 
