@@ -157,27 +157,154 @@ this是Javascript语言的一个关键字它代表函数运行时，自动生成
 
 ## 从输入url到渲染的整个过程
 
+- 输入地址
+- 浏览器查找域名的 IP 地址
+- 这一步包括 DNS 具体的查找过程，包括：浏览器缓存->系统缓存->路由器缓存...
+- 浏览器向 web 服务器发送一个 HTTP 请求
+- 服务器的永久重定向响应（从 http://example.com 到 http://www.example.com）
+- 浏览器跟踪重定向地址
+- 服务器处理请求
+- 服务器返回一个 HTTP 响应
+- 浏览器显示 HTML
+- 浏览器发送请求获取嵌入在 HTML 中的资源（如图片、音频、视频、CSS、JS等等）
+- 浏览器发送异步请求
+
+需要考虑的事情还有很多，比如广播、拆包解包合并包丢包重传、路由表，NAT、TCP 状态机、CDN、HTTPS 证书校验与中间人攻击检测、RSA 密钥协商、AES 加解密、浏览器解析 HTTP 的有限自动状态机、GUI 库与绘图、OpenGL 绘图、GPU 加速（OpenCL 与 CUDA）、JIT（JavaScript 会把 JavaScript 代码编译成汇编代码）、服务器的数据库 NoSQL 或 SQL 查询、主从数据库同步、服务器和浏览器的内存管理（WebKit 实现的 fastMalloc()，服务器上可能是 TCMalloc 或者 JeMalloc）、服务器上的语言解释器（可能也是 JIT）、多媒体：傅里叶变换、H.264 解码（硬件解码，硬件解码的话 GPU 的处理单元又在计算.......或软件解码）、音频解码、WebGL 绘图、浏览器的 Sandbox、服务器的 SQL 注入检查、产生的键盘中断信号处理（或者是高级层面的输入输出驱动）、网卡驱动、网络栈的 TCP FastOpen、SYN Cookie 之类的技术
+
 https://segmentfault.com/q/1010000000489803
 
 ## 三次握手
+
+首先Client端发送连接请求报文，Server段接受连接后回复ACK报文，并为这次连接分配资源。Client端接收到ACK报文后也向Server段发生ACK报文，并分配资源，这样TCP连接就建立了。
+
+
+## 关闭的时候却是四次握手
+【注意】中断连接端可以是Client端，也可以是Server端。
+```
+假设Client端发起中断连接请求，也就是发送FIN报文。Server端接到FIN报文后，意思是说"我Client端没有数据要发给你了"，但是如果你还有数据没有发送完成，则不必急着关闭Socket，可以继续发送数据。所以你先发送ACK，"告诉Client端，你的请求我收到了，但是我还没准备好，请继续你等我的消息"。这个时候Client端就进入 FIN_WAIT 状态，继续等待Server端的FIN报文。当Server端确定数据已发送完成，则向Client端发送FIN报文，"告诉Client端，好了，我这边数据发完了，准备好关闭连接了"。Client端收到FIN报文后，"就知道可以关闭连接了，但是他还是不相信网络，怕Server端不知道要关闭，所以发送ACK后进入 TIME_WAIT 状态，如果Server端没有收到ACK则可以重传。“，Server端收到ACK后，"就知道可以断开连接了"。Client端等待了2MSL后依然没有收到回复，则证明Server端已正常关闭，那好，我Client端也可以关闭连接了。Ok，TCP连接就这样关闭了！
+```
 
 http://blog.csdn.net/whuslei/article/details/6667471/
 
 ## 跨域
 
+这里说的js跨域是指通过js在不同的域之间进行数据传输或通信，比如用ajax向一个不同的域请求数据，或者通过js获取页面中不同域的框架中(iframe)的数据。只要协议、域名、端口有任何一个不同，都被当作是不同的域。
+
+- 通过jsonp跨域
+- 通过修改document.domain来跨子域：只能往更高一级
+- 使用window.name来进行跨域
+- window.postMessage方法来跨域传送数据
+
+
+
 http://www.cnblogs.com/2050/p/3191744.html
 
 ## 懒加载和预加载
 
+#### 什么是懒加载？
+
+懒加载也就是延迟加载。
+当访问一个页面的时候，先把img元素或是其他元素的背景图片路径替换成一张大小为1*1px图片的路径（这样就只需请求一次，俗称占位图），只有当图片出现在浏览器的可视区域内时，才设置图片正真的路径，让图片显示出来。这就是图片懒加载。
+
+懒加载的实现步骤？
+
+1) 首先，不要将图片地址放到src属性中，而是放到其它属性(data-original)中。
+2) 页面加载完成后，根据scrollTop判断图片是否在用户的视野内，如果在，则将data-original属性中的值取出存放到src属性中。
+3) 在滚动事件中重复判断图片是否进入视野，如果进入，则将data-original属性中的值取出存放到src属性中。
+
 http://www.jianshu.com/p/4876a4fe7731
+
+页面加载速度快、可以减轻服务器的压力、节约了流量,用户体验好
+
+#### 什么是预加载？
+
+提前加载图片，当用户需要查看时可直接从本地缓存中渲染
+
+实现预加载的方法有哪些？
+
+- 用CSS和JavaScript实现预加载
+- 仅使用JavaScript实现预加载
+- 使用Ajax实现预加载
+[具体这里](http://web.jobbole.com/86785/)
+
+## em/rem  区别
+
+em：所有现代浏览器下默认字体尺寸是16px，这时1em=16px。然后你人为的把body里面定义font-size:12px;（把浏览器默认16px改小了），此刻1em=12px，如果0.8em实际等于12px*0.8；em的用处是你要整个网页字体统一变大变小你只要改body里面font-size的值就行了。
+
+另外：em会继承父元素的字体大小
+
+如果是块状元素，自身也应该是有默认尺寸的。比如浏览器如果默认的1em是16px，参照下面的表格：
+h1 { font-size: 2em; margin: .67em 0 } 对应32px
+h2 { font-size: 1.5em; margin: .75em 0 } 对应24px
+h3 { font-size: 1.17em; margin: .83em 0 }
+h4, p, blockquote, ul, fieldset, form, ol, dl, dir, menu { margin: 1.12em 0 }
+h5 { font-size: .83em; margin: 1.5em 0 }
+h6 { font-size: .75em; margin: 1.67em 0 }
+
+
+Rem，上面你看到了，em相对父级，嵌套一多了算字体到底多大就很操蛋，所以有了Rem(浏览器支持还不是很理想)，他只相对html或body的字体尺寸(默认还是16px，除非你自己用font-size定义为其他)，没有了继承父级尺寸这个关系。 
 
 ## BFC
 
-http://web.jobbole.com/84808/
+BFC 已经是一个耳听熟闻的词语了，网上有许多关于 BFC 的文章，介绍了如何触发 BFC 以及 BFC 的一些用处（如清浮动，防止 margin 重叠等）。虽然我知道如何利用 BFC 解决这些问题，但当别人问我 BFC 是什么，我还是不能很有底气地解释清楚。于是这两天仔细阅读了CSS2.1 spec 和许多文章来全面地理解BFC。
+
+*BFC是什么？*
+
+在解释 BFC 是什么之前，需要先介绍 Box、Formatting Context的概念。
+
+Box 是 CSS 布局的对象和基本单位， 直观点来说，就是一个页面是由很多个 Box 组成的。元素的类型和 display 属性，决定了这个 Box 的类型。 不同类型的 Box， 会参与不同的 Formatting Context（一个决定如何渲染文档的容器），因此Box内的元素会以不同的方式渲染。让我们看看有哪些盒子：
+
+- block-level box:display 属性为 block, list-item, table 的元素，会生成 block-level box。并且参与 block fomatting context；
+- inline-level box:display 属性为 inline, inline-block, inline-table 的元素，会生成 inline-level box。并且参与 inline formatting context；
+- run-in box: css3 中才有， 这儿先不讲了。
+
+#### Formatting context
+
+　Formatting context 是 W3C CSS2.1 规范中的一个概念。它是页面中的一块渲染区域，并且有一套渲染规则，它决定了其子元素将如何定位，以及和其他元素的关系和相互作用。最常见的 Formatting context 有 Block fomatting context (简称BFC)和 Inline formatting context (简称IFC)。
+
+CSS2.1 中只有 BFC 和 IFC, CSS3 中还增加了 GFC 和 FFC。
+
+#### BFC 定义
+
+BFC(Block formatting context)直译为"块级格式化上下文"。它是一个独立的渲染区域，只有Block-level box参与， 它规定了内部的Block-level Box如何布局，并且与这个区域外部毫不相干。
+
+#### BFC布局规则：
+- 内部的Box会在垂直方向，一个接一个地放置。
+- Box垂直方向的距离由margin决定。属于同一个BFC的两个相邻Box的margin会发生重叠
+- 每个元素的margin box的左边， 与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。
+- BFC的区域不会与float box重叠。
+- BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。反之也如此。
+- 计算BFC的高度时，浮动元素也参与计算 
+
+*哪些元素会生成BFC?*
+
+- 根元素
+- float属性不为none
+- position为absolute或fixed
+- display为inline-block, table-cell, table-caption, flex, inline-flex
+- overflow不为visible
+
+*BFC的作用及原理*
+
+- 自适应两栏布局
+- 清除内部浮动
+- 防止垂直 margin 重叠
+
+其实以上的几个例子都体现了BFC布局规则第五条：
+
+```
+BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。反之也如此。
+```
+
+
+
 
 ## bootstrap是怎么实现grid系统的
 
 http://www.jb51.net/article/93910.htm
+
+## 有趣的知识
+document.defaultView === window
 
 
 
