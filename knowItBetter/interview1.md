@@ -297,14 +297,23 @@ BFC就是页面上的一个隔离的独立容器，容器里面的子元素不�
 ```
 
 
-
-
 ## bootstrap是怎么实现grid系统的
 
 http://www.jb51.net/article/93910.htm
 
+## XSS攻击及防御
+
+转义，预防xss攻击
+
+http://blog.csdn.net/ghsau/article/details/17027893
+
+## CSRF的攻击与防御
+
+http://www.h3c.com.cn/About_H3C/Company_Publication/IP_Lh/2012/04/Home/Catalog/201208/751467_30008_0.htm
+
 ## 有趣的知识
 document.defaultView === window
+当前页面的前一个关联页面 document.referrer
 
 
 
