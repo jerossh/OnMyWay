@@ -102,4 +102,73 @@ function shellSort(arr) { // 先一部分排序，再整体排序
 var arr = [3, 4, 2, 4, 1, 1, 1, 5, 9, 3];
 shellSort(arr);
 
-// 归并排序
+// 归并排序,自上而下归并
+function mergeSort(arr) {
+    var len = arr.length;
+    if (len < 2) {
+        return arr;
+    }
+    var middle = Math.floor(len / 2),
+        left = arr.slice(0, middle),
+        right = arr.slice(middle);
+    return merge(mergeSort(left), mergeSort(right));
+}
+
+function merge(left, right) {
+    var result = [];
+    while (left.length && right.length) {
+        if (left[0] <= right[0]) { // 不管左边右边，小的先移除
+            result.push(left.shift());
+        } else {
+            result.push(right.shift())
+        }
+    }
+
+    while (left.length) {
+        result.push(left.shift());
+    }
+
+    while (right.length) {
+        result.push(right.shift());
+    }
+    return result;
+}
+var arr = [3, 6, 2, 5, 1, 1, 1, 5, 9, 3];
+mergeSort(arr);
+
+// 快速排序，效率高
+// 快速排序的最坏运行情况是 O(n²)，比如说顺序数列的快排。但它的平摊期望时间是 O(nlogn)，且 O(nlogn) 记号中隐含的常数因子很小，
+// 比复杂度稳定等于 O(nlogn) 的归并排序要小很多。所以，对绝大多数顺序性较弱的随机数列而言，快速排序总是优于归并排序。
+function partition(arr, left, right) {
+    var pivot = left, // 基准
+        index = pivot + 1;
+    for (var i = index; i <= right; i++) {
+        if (arr[i] < arr[pivot]) {
+            swap(arr, i, index);
+            index++; // 比基准小的都放在基准后面
+        }
+    }
+    swap(arr, pivot, index - 1); // 循环结束后，基准于最后一位比他小的调换
+    return index - 1; // 返回处理过的最后一个位置
+}
+
+function swap(arr, i, j) {
+    var temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+}
+
+function quickSort(arr, left, right) {
+    var len = arr.length,
+        partitionIndex,
+        left = typeof left !== 'number' ? 0 : left,
+        right = typeof right !== 'number' ? len - 1 : right;
+    if (left < right) {
+        partitionIndex = partition(arr, left, right);
+        quickSort(arr, left, partitionIndex - 1); // 对分区排序过的进行递归
+        quickSort(arr, partitionIndex + 1, right); // 递归继续处理未排序的
+    }
+    return arr;
+}
+var arr = [3, 6, 2, 5, 1, 1, 1, 5, 9, 3];
+quickSort(arr);
