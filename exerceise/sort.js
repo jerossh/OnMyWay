@@ -76,4 +76,30 @@ function insertSort(arr) { // 插入快排
     return arr;
 }
 var arr = [3, 4, 2, 4, 1, 1, 1, 5, 9, 3];
-insertSort('12');
+insertSort(arr);
+
+
+// 希尔排序
+function shellSort(arr) { // 先一部分排序，再整体排序
+    var len = arr.length,
+        tem,
+        gap = 1;
+    while (gap < len) {
+        gap = gap * 3 + 1; // 显示大跨度 4， 最后 gap
+    }
+    for (gap; gap > 0; gap = Math.floor(gap / 3)) { // gap = 4, gap = 1;
+        for (var i = gap; i < len; i++) { // i = 4, 到 i = 10
+            temp = arr[i];
+            // console.log(i)
+            for (var j = i - gap; j >= 0 && arr[j] > temp; j -= gap) { // 0,1,2
+                arr[j + gap] = arr[j];
+            }
+            arr[j + gap] = temp; // j 无法运行的时候，在填回来
+        }
+    }
+    return arr;
+}
+var arr = [3, 4, 2, 4, 1, 1, 1, 5, 9, 3];
+shellSort(arr);
+
+// 归并排序
