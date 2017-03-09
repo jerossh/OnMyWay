@@ -69,7 +69,7 @@ function deepCopy(obj) {
                     currentCopyElement[key] = copyVisitedQueue[index];
                 } else {
                     srcQueue.push(currentSrcElement[key]);
-                    currentCopyElement[key] = {};
+                    currentCopyElement[key] = {}; // 修改这个引用，currentCopyElement[key] 的内容也会变
                     copyQueue.push(currentCopyElement[key]);
                 }
             }
