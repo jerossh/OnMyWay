@@ -311,8 +311,33 @@ http://blog.csdn.net/ghsau/article/details/17027893
 
 http://www.h3c.com.cn/About_H3C/Company_Publication/IP_Lh/2012/04/Home/Catalog/201208/751467_30008_0.htm
 
+## 深入了解viewport和px
+
+px并非像素，px的大小和页面设置的 viewport 有关。
+
+![viewport](../images/viewport.jpg)
+
+例如iPhone4S如果不设置viewport，他就会默认是980px，就像把屏幕分成980份（不是屏幕分辨率的640px哦！）。如果设置一个元素为100px*100px，看起来就是屏幕的100/980，可能如下图所示：
+
+![viewport](../images/viewport980.jpg)
+
+例如iPhone4S如果设置viewport width=device-width，他就会是320px，就像把屏幕分成320份（不是屏幕分辨率的640px哦！）。如果设置一个元素为100px*100px，看起来就是屏幕的100/320，可能如下图所示：
+
+![viewport](../images/viewportdevice.jpg)
+
+iPhone6的屏幕分辨率是1334*750px，ppi是326，所以系数是2x。那device-width就等于750/2=375px。
+
+红米1s的屏幕分辨率是1280*720px，ppi是312，所以系数是2x。那device-width就等于720/2=360px。
+
+三星note4的屏幕分辨率是2560*1440px，ppi是515，所以系数是4x。那device-width就等于1440/4=360px，和小米的divice-width一样大小。但是看起来左边的红色块明显大于右边，因为左边的设备大啊，虽然两者都是分成360份，但是明显左边的1份比右边的1份大。
+
+缩放级别对应
+
+![xxx](../images/xxx.jpg)
+
 ## 有趣的知识
 document.defaultView === window
+
 当前页面的前一个关联页面 document.referrer
 
 
