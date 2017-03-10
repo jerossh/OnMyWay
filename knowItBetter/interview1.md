@@ -318,6 +318,13 @@ http://blog.csdn.net/ghsau/article/details/17027893
 
 ## CSRF的攻击与防御
 
+Cross-Site Request Forgery，跨站点伪造请求
+
+#### 预防手段
+- 验证HTTP Referer字段
+- 在请求地址中添加token并验证
+- 在HTTP头中自定义属性并验证
+
 http://www.h3c.com.cn/About_H3C/Company_Publication/IP_Lh/2012/04/Home/Catalog/201208/751467_30008_0.htm
 
 ## 深入了解viewport和px
