@@ -31,3 +31,13 @@ yum install -y python
 yum -y install gcc automake autoconf libtool make
 yum install gcc gcc-c++
 ```
+
+# ssh 崩溃问题
+
+由于 windows 系统 cmd 的一些缺陷，导致了服务端 ssh 的崩溃, 端口被占用。目前不知道怎么解决，都是墨妙棋妙好了。
+
+重启ssh 服务
+
+```
+service sshd restart
+```
