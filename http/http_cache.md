@@ -12,11 +12,13 @@
 
 需要注意的是，Expires 是 HTTP 1.0 的东西，现在绝大多数浏览器都默认使用 HTTP 1.1，所以用 Expires 控制缓存不是首选的方法。
 
+Expires的问题是 本地时间与服务器时间也许不同步，就会造成意想不到的结果。
+
 ## Cache-control
 
 Cache-control 与 Expires 作用基本相同，都是标志出当前资源的有效期，以此来控制浏览器是使用本地缓存还是从服务器重新获取资源。不过，不同的地方在于，Cache-control 能够控制的更加细致，当header中同时存在 Expires 时，Cache-control 的优先级要更高一些。
 
-HTTP协议头 Cache-Control 的值可以是 public、private、no-cache、no- store、no-transform、must-revalidate、proxy-revalidate、max-age
+HTTP协议头 Cache-Control 的值可以是 public、private、no-cache、no-store、no-transform、must-revalidate、proxy-revalidate、max-age
 
 各个消息中的指令含义如下：
   - Public 指示响应可被任何缓存区缓存。
