@@ -48,3 +48,5 @@ HTTP协议头 Cache-Control 的值可以是 public、private、no-cache、no-sto
 <meta http-equiv="Expires" content="0" />
 ```
 相关语言设置可以在[这里看到](http://stackoverflow.com/questions/49547/making-sure-a-web-page-is-not-cached-across-all-browsers)
+
+更多详细信息:[浏览器缓存详解:expires,cache-control,last-modified,etag详细说明](http://blog.csdn.net/eroswang/article/details/8302191)
