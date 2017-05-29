@@ -41,3 +41,7 @@ yum install gcc gcc-c++
 ```
 service sshd restart
 ```
+最后发现是 阿里云 设置了 ip 限制的原因。。。 自己的 ip 整天变。
+
+```发现
+```
