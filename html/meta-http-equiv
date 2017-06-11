@@ -1,0 +1,8 @@
+meta 标签页面的http-equiv 属性
+
+- content-type
+- expires
+- refresh
+- set-cookie
+
+关联到 header, 然而 koa ctx.res.header 失败了。
