@@ -1,1 +1,9 @@
 
+创建仓库
+sudo git init --bare sample.git
+
+本地拉取
+git clone ./../srv/kapu2.git
+
+从服务器啦取
+git clone 用户@服务器:/srv/sample.git
