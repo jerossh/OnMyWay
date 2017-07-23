@@ -18,6 +18,20 @@ Team.find({
 ```
 
 ## 修改功能
+
+inc, mul, rename, setOnLnsert, set, unset, min, max, current
+
+$rename 可以修改数据库内容 错误的属性名，可以 修改 embeded doc 的属性名
+
+```js
+db.students.updateMany( {}, { $rename: { "nmae": "name" } } )
+db.students.update( { _id: 1 }, { $rename: { "name.first": "name.fname" } } )
+```
+
+$setOnLnsert 不是很理解，配合 upsert: true, 就可以无中生有，强行插入一个 属性。
+
+
+$set 是最基础的，就是修改的意思， unset 表示 去除该属性。嗯，也很有用，可以修改老数据库的内容。
 ```js
 // 直接修改 $set
 query.findByIdAndUpdate(id, {$set:{'name': '修改为张三'}});
@@ -25,7 +39,13 @@ query.findByIdAndUpdate(id, {$set:{'name': '修改为张三'}});
 query.findByIdAndUpdate(id, {'name': '修改为张三'});
 ```
 
-修改数组
+$min 表示 新数据与原数据比较，如果新数据小，则更新；$max 相反。
+
+$currentDate 看不懂什么意思，时间戳或是iso 时间有什么用？
+
+$isolated ，分离具体什么场景使用？
+
+#### 修改数组
 有push sort 等等，[数组修改](https://docs.mongodb.com/manual/reference/operator/update-array/)
 
 ```js
