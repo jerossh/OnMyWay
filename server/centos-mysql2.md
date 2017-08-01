@@ -31,10 +31,10 @@ LOAD DATA LOCAL INFILE 'csv/cuspea.csv' INTO TABLE Cuspeas CHARACTER SET utf8;
 
 ## 错误
 
-*The MySQL server is running with the --secure-file-priv option so it cannot execute this statement
+*The MySQL server is running with the --secure-file-priv option so it cannot execute this statement*
 
 权限问题
 
-*ERROR 1045 (28000): Access denied for user
+*ERROR 1045 (28000): Access denied for user*
 
 也是权限问题，好吧，那怎么办？
