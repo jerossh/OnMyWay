@@ -5,7 +5,13 @@ mysql -u 用户名 -p
 
 ## 建立一个名为xhkdb的数据库：
 ```bash
-create database xhkdb;  // 不要忘记封号
+create database xhkdb;  // 不要忘记封号, 默认 latin
+
+汉字的话，创建数据库记得携带编码
+
+GBK: create database test2 DEFAULT CHARACTER SET gbk COLLATE gbk_chinese_ci;  
+  
+UTF8: CREATE DATABASE `test2` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;  
 ```
 
 ## 创建数据库并分配用户：
