@@ -1,5 +1,9 @@
 http://www.cnblogs.com/xiaobai110/p/6654621.html
 
+学习：
+
+包括虚拟DOM， JSX ，函数式编程和immutable，单向数据流，组件化抽象，生命周期等
+
 ## 几种实现双向绑定的做法
 
 目前几种主流的mvc(vm)框架都实现了单向数据绑定，而我所理解的双向数据绑定无非就是在单向绑定的基础上给可输入元素（input、textare等）添加了change(input)事件，来动态修改model和 view，并没有多高深。所以无需太过介怀是实现的单向或双向绑定。
