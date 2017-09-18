@@ -48,3 +48,27 @@ A:因为假如用Socket.IO之类的node库，它们的js/css文件要从node中�
 #### Q:为什么看别的try_files里面有$uri/,这个只有$uri？
 
 A:因为写上$uri/会显示Nginx的404，这时候应用内就等于有2个404页面。。不加$uri/就只有node中的404页面。
+
+
+#### 如果需要 原域名和ip
+
+A：
+```
+server {
+    listen 443;
+    server_name kapuw.net;
+    ssl on;
+    ssl_certificate   cert/214087429970291.pem;
+    ssl_certificate_key  cert/214087429970291.key;
+    ssl_session_timeout 5m;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    location / {
+        proxy_pass http://127.0.0.1:3008;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+```
