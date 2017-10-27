@@ -88,6 +88,12 @@ command -v nvm
 nvm install node
 ```
 
+## npm 切换淘宝源
+```bash
+npm config set registry https://registry.npm.taobao.org 
+npm info underscore （如果上面配置正确这个命令会有字符串response）
+```
+
 
 ## 如何在生产服务器上部署 Node.js 应用
 
