@@ -2,8 +2,13 @@
 创建仓库
 sudo git init --bare sample.git
 
+修改权限给git用户
+sudo chown -R gitGo:gitGo sample.git
+
 本地拉取
 git clone ./../srv/kapu2.git
 
 从服务器啦取
 git clone 用户@服务器:/srv/sample.git
+
+第一次push 时候，记得加 -u，表示推到 master 分支。
