@@ -1,0 +1,5 @@
+## create a git store
+1. sudo adduser 用户
+2. passwd 用户
+3. 到git仓库文件夹 sudo git init --bare sample.git
+4. sudo chown -R 用户:用户 sample.git 设置权限
